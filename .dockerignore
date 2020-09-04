@@ -2,6 +2,7 @@
 # folder
 !/pages
 # config files alphabetically
+!/entrypoint.sh
 !/next-env.d.ts
 !/next.config.js
 !/package.json
