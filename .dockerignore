@@ -1,0 +1,9 @@
+*
+# folder
+!/pages
+# config files alphabetically
+!/next-env.d.ts
+!/next.config.js
+!/package.json
+!/tsconfig.json
+!/yarn.lock
