@@ -14,5 +14,6 @@ ENV NODE_ENV=production
 EXPOSE 3000
 COPY package.json yarn.lock /app/
 RUN yarn install --prod
+COPY public /app/public
 COPY entrypoint.sh /app/
 COPY --from=builder /app/.next /app/.next
