@@ -3,7 +3,12 @@
 !/components
 !/pages
 !/public
+!/src
 # config files alphabetically
+!/.babelrc
+!/.editorconfig
+!/.eslintrc.js
+!/.prettierrc
 !/entrypoint.sh
 !/next-env.d.ts
 !/next.config.js
