@@ -3,15 +3,15 @@ import { useEffect, useRef, useState } from 'react'
 function useMidiSupported() {
   const [v, setV] = useState<boolean | null>(null)
   useEffect(() => {
-    setV(!!(navigator as any).requestMIDIAccess)
+    setV(!!navigator.requestMIDIAccess)
   }, [])
   return v
 }
 
 export default function MiDi() {
   const [devices, setDevices] = useState({
-    midiIn: [] as any[],
-    midiOut: [] as any[],
+    midiIn: [] as MIDIInput[],
+    midiOut: [] as MIDIOutput[],
   })
   const supported = useMidiSupported()
 
@@ -42,11 +42,11 @@ export default function MiDi() {
   )
 }
 
-function MidiInputDevice({ device }: { device: any }) {
-  const [notesOn, setNotesOn] = useState([])
+function MidiInputDevice({ device }: { device: MIDIInput }) {
+  const [notesOn, setNotesOn] = useState<number[]>([])
   useEffect(() => {
     const notesOn = new Map()
-    function midiMessageReceived(event: any) {
+    function midiMessageReceived(event: MIDIMessageEvent) {
       // MIDI commands we care about. See
       // http://webaudio.github.io/web-midi-api/#a-simple-monophonic-sine-wave-midi-synthesizer.
       const NOTE_ON = 9
@@ -63,7 +63,7 @@ function MidiInputDevice({ device }: { device: any }) {
       if (cmd === NOTE_OFF || (cmd === NOTE_ON && velocity === 0)) {
         setNotesOn((prev) => prev.filter((p) => p !== pitch))
         console.log(
-          `🎧 from ${event.srcElement.name} note off: pitch:${pitch}, velocity: ${velocity}`,
+          `🎧 from ${event.currentTarget.name} note off: pitch:${pitch}, velocity: ${velocity}`,
         )
 
         // Complete the note!
@@ -75,7 +75,7 @@ function MidiInputDevice({ device }: { device: any }) {
       } else if (cmd === NOTE_ON) {
         setNotesOn((prev) => prev.filter((p) => p !== pitch).concat(pitch))
         console.log(
-          `🎧 from ${event.srcElement.name} note off: pitch:${pitch}, velocity: {velocity}`,
+          `🎧 from ${event.currentTarget.name} note off: pitch:${pitch}, velocity: {velocity}`,
         )
 
         // One note can only be on at once.
@@ -93,11 +93,11 @@ function MidiInputDevice({ device }: { device: any }) {
 function MidiListener({
   onStateChange,
 }: {
-  onStateChange: (midi: any) => void
+  onStateChange: (midi: MIDIAccess) => void
 }) {
-  const [midi, setMidi] = useState<any>(null)
+  const [midi, setMidi] = useState<MIDIAccess | null>(null)
   useEffect(() => {
-    ;(navigator as any).requestMIDIAccess().then(setMidi)
+    navigator.requestMIDIAccess().then(setMidi)
   }, [])
 
   const ref = useRef(onStateChange)
@@ -107,8 +107,8 @@ function MidiListener({
 
   useEffect(() => {
     if (!midi) return
-    const handleStateChange = (event: any) => {
-      ref.current?.(event.target)
+    const handleStateChange = () => {
+      ref.current?.(midi)
     }
     ref.current?.(midi)
     midi?.addEventListener('statechange', handleStateChange)

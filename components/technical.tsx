@@ -1,8 +1,8 @@
-import { PropsWithChildren, useState } from 'react'
+import { ReactNode, useState } from 'react'
 
 let timeoutHandle: ReturnType<typeof setTimeout> | null
 
-function CopyOnClick({ children }: PropsWithChildren<{}>) {
+function CopyOnClick({ children }: { children: ReactNode }) {
   return (
     <>
       <style jsx>{`
