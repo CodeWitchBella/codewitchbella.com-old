@@ -44,6 +44,7 @@ export default function FEL() {
             type="checkbox"
             onChange={(evt) => setShowTitles(evt.target.checked)}
             css={{ paddingInlineEnd: '.5rem' }}
+            checked={showTitles}
           />
           Zobraz názvy
         </label>
