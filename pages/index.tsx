@@ -1,5 +1,5 @@
 import { Technical } from '../components/technical'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
 export default function Index() {
   return (
