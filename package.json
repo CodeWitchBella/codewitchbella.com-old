@@ -14,11 +14,13 @@
   "dependencies": {
     "@emotion/cache": "^11.0.0-next.18",
     "@emotion/react": "^11.0.0-next.17",
+    "@emotion/styled": "^11.0.0-next.17",
     "next": "^9.5.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },
   "devDependencies": {
+    "@emotion/babel-plugin": "^11.0.0-next.17",
     "@emotion/eslint-plugin": "^11.0.0-next.10",
     "@mdx-js/loader": "^1.6.16",
     "@next/mdx": "^9.5.3",
