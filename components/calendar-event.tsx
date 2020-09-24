@@ -15,13 +15,19 @@ export function CalEvent({
   children?: ReactNode
 }) {
   const ctx = useContext(eventContext)
+  const subject = ctx.subjects[title]
   return (
     <Event>
       <div css={{ fontWeight: 'bold' }}>
-        {title} {type === 'lecture' ? 'přednáška' : 'cvičení'}
+        {title}{' '}
+        {!ctx.czech ? type : type === 'lecture' ? 'přednáška' : 'cvičení'}
       </div>
       <div>{time}</div>
-      {ctx.showTitles ? <div>{ctx.names[title]}</div> : null}
+      {ctx.showTitles ? (
+        <div>
+          {ctx.czech ? subject?.name : subject?.enname ?? subject?.name ?? ''}
+        </div>
+      ) : null}
       {children}
     </Event>
   )
@@ -34,7 +40,10 @@ const Event = styled.div({
 })
 
 const eventContext = createContext({
-  names: {} as { [key: string]: string },
+  subjects: {} as {
+    [key: string]: { name: string; enname?: string } | undefined
+  },
   showTitles: false,
+  czech: true,
 })
 export const EventProvider = eventContext.Provider

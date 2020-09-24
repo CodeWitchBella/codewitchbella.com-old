@@ -1,32 +1,57 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react'
 import styled from '@emotion/styled'
-import { useState } from 'react'
+import { useRouter } from 'next/dist/client/router'
+import { useCallback, useState } from 'react'
 import { CalEvent, EventProvider } from '../components/calendar-event'
 
 export default function FEL() {
   const [showTitles, setShowTitles] = useState(false)
+  const [english, toggleLang] = useEn()
   return (
     <EventProvider
       value={{
         showTitles,
-        names: {
-          DPG: 'Datové struktury počítačové grafiky',
-          APG: 'Algoritmy počítačové grafiky',
-          GPU: 'Obecné výpočty na grafických procesorech',
-          VG: 'Výpočetní geometrie',
-          MMA: 'Multimédia a počítačová animace',
-          ITT: 'Intermediální tvorba a technologie',
+        czech: !english,
+        subjects: {
+          DPG: {
+            name: 'Datové struktury počítačové grafiky',
+            enname: 'Data Structures for Computer Graphics',
+          },
+          APG: {
+            name: 'Algoritmy počítačové grafiky',
+            enname: 'Algorithms of Computer Graphics',
+          },
+          GPU: {
+            name: 'Obecné výpočty na grafických procesorech',
+            enname: 'General-Purpose Computing on GPU',
+          },
+          VG: { name: 'Výpočetní geometrie', enname: 'Computational Geometry' },
+          MMA: {
+            name: 'Multimédia a počítačová animace',
+            enname: 'Multimedia and Computer Animation',
+          },
+          ITT: {
+            name: 'Intermediální tvorba a technologie I',
+            enname: 'Applied Multimedia and Technology I',
+          },
         },
       }}
     >
-      <label>
-        <input
-          type="checkbox"
-          onChange={(evt) => setShowTitles(evt.target.checked)}
-        />
-        Zobraz názvy
-      </label>
+      <div css={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <label>
+          <input
+            type="checkbox"
+            onChange={(evt) => setShowTitles(evt.target.checked)}
+            css={{ paddingInlineEnd: '.5rem' }}
+          />
+          Zobraz názvy
+        </label>
+        <button onClick={() => toggleLang()} type="button">
+          <span css={english ? {} : { fontWeight: 'bold' }}>CZ</span> |{' '}
+          <span css={english ? { fontWeight: 'bold' } : {}}>EN</span>
+        </button>
+      </div>
       <Week>
         <Day>
           <DayTitle>Pondělí/Monday</DayTitle>
@@ -83,3 +108,17 @@ const Day = styled.div({
 const DayTitle = styled.div({
   alignSelf: 'center',
 })
+
+function useEn() {
+  const router = useRouter()
+
+  const current = router.query.lang === 'en'
+  return [
+    current,
+    useCallback(() => {
+      const q = { ...router.query, lang: 'en' as 'en' | undefined }
+      if (current) delete q.lang
+      router.replace({ query: q })
+    }, [current, router]),
+  ] as const
+}
