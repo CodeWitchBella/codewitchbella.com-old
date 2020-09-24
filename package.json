@@ -9,16 +9,17 @@
     "build": "NEXT_TELEMETRY_DISABLED=1 next build",
     "dev": "NEXT_TELEMETRY_DISABLED=1 next dev --hostname 0.0.0.0",
     "start": "NEXT_TELEMETRY_DISABLED=1 next start",
-    "eslint": "eslint --ext .ts,.tsx pages components --cache"
+    "eslint": "eslint --ext .ts,.tsx --cache pages components src"
   },
   "dependencies": {
-    "@emotion/cache": "^10.0.29",
+    "@emotion/cache": "^11.0.0-next.18",
     "@emotion/react": "^11.0.0-next.17",
     "next": "^9.5.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },
   "devDependencies": {
+    "@emotion/eslint-plugin": "^11.0.0-next.10",
     "@mdx-js/loader": "^1.6.16",
     "@next/mdx": "^9.5.3",
     "@types/node": "^14.6.4",
