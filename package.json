@@ -8,7 +8,8 @@
   "scripts": {
     "build": "NEXT_TELEMETRY_DISABLED=1 next build",
     "dev": "NEXT_TELEMETRY_DISABLED=1 next dev --hostname 0.0.0.0",
-    "start": "NEXT_TELEMETRY_DISABLED=1 next start"
+    "start": "NEXT_TELEMETRY_DISABLED=1 next start",
+    "eslint": "eslint --ext .ts,.tsx pages components --cache"
   },
   "dependencies": {
     "next": "^9.5.3",
@@ -20,7 +21,19 @@
     "@next/mdx": "^9.5.3",
     "@types/node": "^14.6.4",
     "@types/react": "^16.9.49",
-    "prettier": "^2.1.1",
+    "@typescript-eslint/eslint-plugin": "^4.2.0",
+    "@typescript-eslint/parser": "^4.2.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.9.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-config-react-app": "^5.2.1",
+    "eslint-plugin-flowtype": "^5.2.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.21.1",
+    "eslint-plugin-react-hooks": "^4.1.2",
+    "prettier": "^2.1.2",
     "typescript": "^4.0.2"
   }
 }

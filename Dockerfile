@@ -6,6 +6,7 @@ FROM base as builder
 COPY package.json yarn.lock /app/
 RUN yarn
 COPY . /app/
+RUN yarn eslint
 RUN yarn build
 
 FROM base as prod
