@@ -2,17 +2,19 @@
 import { jsx } from '@emotion/react'
 import styled from '@emotion/styled'
 import { useRouter } from 'next/dist/client/router'
-import { useCallback, useState } from 'react'
-import { CalEvent, EventProvider } from '../components/calendar-event'
+import { useCallback } from 'react'
+import { CalEvent, Cz, En, EventProvider } from '../components/calendar-event'
 
 export default function FEL() {
-  const [showTitles, setShowTitles] = useState(false)
+  const [showTitles, setShowTitles] = useBooleanQueryParam('titles', false)
   const [english, toggleLang] = useEn()
+  const [deets, setDeets] = useBooleanQueryParam('deets', false)
   return (
     <EventProvider
       value={{
         showTitles,
         czech: !english,
+        deets,
         subjects: {
           DPG: {
             name: 'Datové struktury počítačové grafiky',
@@ -39,6 +41,10 @@ export default function FEL() {
       }}
     >
       <div css={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <button onClick={() => toggleLang()} type="button">
+          <span css={english ? {} : { fontWeight: 'bold' }}>CZ</span> |{' '}
+          <span css={english ? { fontWeight: 'bold' } : {}}>EN</span>
+        </button>
         <label>
           <input
             type="checkbox"
@@ -46,39 +52,62 @@ export default function FEL() {
             css={{ paddingInlineEnd: '.5rem' }}
             checked={showTitles}
           />
-          Zobraz názvy
+          <Cz>Zobraz názvy</Cz>
+          <En>Show names</En>
         </label>
-        <button onClick={() => toggleLang()} type="button">
-          <span css={english ? {} : { fontWeight: 'bold' }}>CZ</span> |{' '}
-          <span css={english ? { fontWeight: 'bold' } : {}}>EN</span>
-        </button>
+        <label>
+          <input
+            type="checkbox"
+            onChange={(evt) => setDeets(evt.target.checked)}
+            css={{ paddingInlineEnd: '.5rem' }}
+            checked={deets}
+          />
+          <Cz>Detaily</Cz>
+          <En>Details</En>
+        </label>
       </div>
       <Week>
         <Day>
-          <DayTitle>Pondělí/Monday</DayTitle>
+          <DayTitle>
+            <Cz>Pondělí/</Cz>Monday
+          </DayTitle>
           <CalEvent type="lecture" title="DPG" time="11:00 - 12:30"></CalEvent>
           <CalEvent type="seminar" title="APG" time="12:45 - 14:15"></CalEvent>
           <CalEvent type="seminar" title="DPG" time="14:30 - 16:00"></CalEvent>
         </Day>
         <Day>
-          <DayTitle>Úterý/Tuesday</DayTitle>
+          <DayTitle>
+            <Cz>Úterý/</Cz>Tuesday
+          </DayTitle>
           <CalEvent type="lecture" title="GPU" time="11:00 - 12:30"></CalEvent>
           <CalEvent type="seminar" title="GPU" time="14:30 - 16:00"></CalEvent>
         </Day>
         <Day>
-          <DayTitle>Středa/Thursday</DayTitle>
+          <DayTitle>
+            <Cz>Středa/</Cz>Thursday
+          </DayTitle>
           <CalEvent type="lecture" title="APG" time="16:15 - 17:45"></CalEvent>
         </Day>
         <Day>
-          <DayTitle>Čtvrtek/Wednesday</DayTitle>
+          <DayTitle>
+            <Cz>Čtvrtek/</Cz>Wednesday
+          </DayTitle>
           <CalEvent type="lecture" title="VG" time="9:15 - 10:45"></CalEvent>
           <CalEvent type="seminar" title="VG" time="11:00 - 12:30"></CalEvent>
           <CalEvent type="lecture" title="MMA" time="12:45 - 14:15"></CalEvent>
           <CalEvent type="seminar" title="MMA" time="14:30 - 16:00"></CalEvent>
         </Day>
         <Day>
-          <DayTitle>Pátek/Friday</DayTitle>
-          <CalEvent type="lecture" title="ITT" time="12:45 - 14:15"></CalEvent>
+          <DayTitle>
+            <Cz>Pátek/</Cz>Friday
+          </DayTitle>
+          <CalEvent type="lecture" title="ITT" time="12:45 - 14:15">
+            <Cz>
+              Vyzkouset <a href="http://puredata.info/">pure data</a> a{' '}
+              <a href="https://vvvv.org">vvvv</a>.<br />
+              Probiha na Teams (mozna se presune na google meet).
+            </Cz>
+          </CalEvent>
           <CalEvent type="seminar" title="ITT" time="14:30 - 16:00"></CalEvent>
         </Day>
       </Week>
@@ -121,5 +150,35 @@ function useEn() {
       if (current) delete q.lang
       router.replace({ query: q })
     }, [current, router]),
+  ] as const
+}
+
+function useQueryParam(param: string) {
+  const router = useRouter()
+
+  const current = router.query[param]
+  return [
+    current,
+    useCallback(
+      (value: string | null) => {
+        const q = { ...router.query, [param]: value }
+        if (value === null) delete q[param]
+        router.replace({ query: q })
+      },
+      [router, param],
+    ),
+  ] as const
+}
+
+function useBooleanQueryParam(param: string, def: boolean) {
+  const [v, setV] = useQueryParam(param)
+  return [
+    def ? v !== 'false' : v === 'true',
+    useCallback(
+      (value: boolean) => {
+        setV(value ? (def ? null : 'true') : def ? 'false' : null)
+      },
+      [def, setV],
+    ),
   ] as const
 }

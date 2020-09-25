@@ -28,7 +28,7 @@ export function CalEvent({
           {ctx.czech ? subject?.name : subject?.enname ?? subject?.name ?? ''}
         </div>
       ) : null}
-      {children}
+      {ctx.deets ? children : null}
     </Event>
   )
 }
@@ -45,5 +45,18 @@ const eventContext = createContext({
   },
   showTitles: false,
   czech: true,
+  deets: false,
 })
 export const EventProvider = eventContext.Provider
+
+export function En({ children }: { children: ReactNode }) {
+  const ctx = useContext(eventContext)
+  if (ctx.czech) return null
+  return <>{children}</>
+}
+
+export function Cz({ children }: { children: ReactNode }) {
+  const ctx = useContext(eventContext)
+  if (!ctx.czech) return null
+  return <>{children}</>
+}
