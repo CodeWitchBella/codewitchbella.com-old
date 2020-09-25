@@ -71,31 +71,51 @@ export default function FEL() {
           <DayTitle>
             <Cz>Pondělí/</Cz>Monday
           </DayTitle>
-          <CalEvent type="lecture" title="DPG" time="11:00 - 12:30"></CalEvent>
-          <CalEvent type="seminar" title="APG" time="12:45 - 14:15"></CalEvent>
-          <CalEvent type="seminar" title="DPG" time="14:30 - 16:00"></CalEvent>
+          <CalEvent type="lecture" title="DPG" time="11:00 - 12:30">
+            Teams
+          </CalEvent>
+          <CalEvent type="seminar" title="APG" time="12:45 - 14:15">
+            Teams
+          </CalEvent>
+          <CalEvent type="seminar" title="DPG" time="14:30 - 16:00">
+            Teams
+          </CalEvent>
         </Day>
         <Day>
           <DayTitle>
             <Cz>Úterý/</Cz>Tuesday
           </DayTitle>
-          <CalEvent type="lecture" title="GPU" time="11:00 - 12:30"></CalEvent>
-          <CalEvent type="seminar" title="GPU" time="14:30 - 16:00"></CalEvent>
+          <CalEvent type="lecture" title="GPU" time="11:00 - 12:30">
+            Zoom
+          </CalEvent>
+          <CalEvent type="seminar" title="GPU" time="14:30 - 16:00">
+            Zoom
+          </CalEvent>
         </Day>
         <Day>
           <DayTitle>
             <Cz>Středa/</Cz>Thursday
           </DayTitle>
-          <CalEvent type="lecture" title="APG" time="16:15 - 17:45"></CalEvent>
+          <CalEvent type="lecture" title="APG" time="16:15 - 17:45">
+            Teams
+          </CalEvent>
         </Day>
         <Day>
           <DayTitle>
             <Cz>Čtvrtek/</Cz>Wednesday
           </DayTitle>
-          <CalEvent type="lecture" title="VG" time="9:15 - 10:45"></CalEvent>
-          <CalEvent type="seminar" title="VG" time="11:00 - 12:30"></CalEvent>
-          <CalEvent type="lecture" title="MMA" time="12:45 - 14:15"></CalEvent>
-          <CalEvent type="seminar" title="MMA" time="14:30 - 16:00"></CalEvent>
+          <CalEvent type="lecture" title="VG" time="9:15 - 10:45">
+            Zoom
+          </CalEvent>
+          <CalEvent type="seminar" title="VG" time="11:00 - 12:30">
+            Zoom
+          </CalEvent>
+          <CalEvent type="lecture" title="MMA" time="12:45 - 14:15">
+            Teams
+          </CalEvent>
+          <CalEvent type="seminar" title="MMA" time="14:30 - 16:00">
+            Teams
+          </CalEvent>
         </Day>
         <Day>
           <DayTitle>
@@ -108,7 +128,9 @@ export default function FEL() {
               Probiha na Teams (mozna se presune na google meet).
             </Cz>
           </CalEvent>
-          <CalEvent type="seminar" title="ITT" time="14:30 - 16:00"></CalEvent>
+          <CalEvent type="seminar" title="ITT" time="14:30 - 16:00">
+            Teams
+          </CalEvent>
         </Day>
       </Week>
     </EventProvider>
