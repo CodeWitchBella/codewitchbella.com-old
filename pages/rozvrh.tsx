@@ -2,7 +2,7 @@
 import { jsx } from '@emotion/react'
 import styled from '@emotion/styled'
 import { useRouter } from 'next/dist/client/router'
-import { useCallback } from 'react'
+import { ReactNode, useCallback } from 'react'
 import { CalEvent, Cz, En, EventProvider } from '../components/calendar-event'
 
 export default function FEL() {
@@ -103,8 +103,8 @@ export default function FEL() {
           </DayTitle>
           <CalEvent type="lecture" title="ITT" time="12:45 - 14:15">
             <Cz>
-              Vyzkouset <a href="http://puredata.info/">pure data</a> a{' '}
-              <a href="https://vvvv.org">vvvv</a>.<br />
+              Vyzkouset <Link to="http://puredata.info/">pure data</Link> a{' '}
+              <Link to="https://vvvv.org">vvvv</Link>.<br />
               Probiha na Teams (mozna se presune na google meet).
             </Cz>
           </CalEvent>
@@ -181,4 +181,12 @@ function useBooleanQueryParam(param: string, def: boolean) {
       [def, setV],
     ),
   ] as const
+}
+
+function Link({ to, children }: { to: string; children: ReactNode }) {
+  return (
+    <a href={to} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  )
 }
