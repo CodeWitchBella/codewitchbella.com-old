@@ -137,14 +137,16 @@ export default function FEL() {
             <Cz>Pátek/</Cz>Friday
           </DayTitle>
           <CalEvent type="lecture" title="ITT" time="12:45 - 14:15">
-            <Cz>
+            <div>
               Teams
               <br />
-              Vyzkouset <Link to="http://puredata.info/">pure data</Link> a{' '}
-              <Link to="https://vvvv.org">vvvv</Link>.<br />
               <Link to="https://cw.fel.cvut.cz/wiki/courses/b0m39itt1/start">
                 CourseWare
               </Link>
+            </div>
+            <Cz>
+              Vyzkouset <Link to="http://puredata.info/">pure data</Link> a{' '}
+              <Link to="https://vvvv.org">vvvv</Link>.<br />
             </Cz>
           </CalEvent>
           <CalEvent type="seminar" title="ITT" time="14:30 - 16:00">
