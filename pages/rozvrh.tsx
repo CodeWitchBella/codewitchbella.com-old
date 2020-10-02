@@ -145,7 +145,7 @@ export default function FEL() {
               </Link>
             </div>
             <Cz>
-              Vyzkouset <Link to="http://puredata.info/">pure data</Link> a{' '}
+              Vyzkouset <Link to="https://www.purrdata.net/">purrdata</Link> a{' '}
               <Link to="https://vvvv.org">vvvv</Link>.<br />
             </Cz>
           </CalEvent>
