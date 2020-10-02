@@ -138,9 +138,13 @@ export default function FEL() {
           </DayTitle>
           <CalEvent type="lecture" title="ITT" time="12:45 - 14:15">
             <Cz>
+              Teams
+              <br />
               Vyzkouset <Link to="http://puredata.info/">pure data</Link> a{' '}
               <Link to="https://vvvv.org">vvvv</Link>.<br />
-              Probiha na Teams (mozna se presune na google meet).
+              <Link to="https://cw.fel.cvut.cz/wiki/courses/b0m39itt1/start">
+                CourseWare
+              </Link>
             </Cz>
           </CalEvent>
           <CalEvent type="seminar" title="ITT" time="14:30 - 16:00">
