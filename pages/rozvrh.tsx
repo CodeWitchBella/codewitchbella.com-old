@@ -78,13 +78,25 @@ export default function FEL() {
             <Cz>Pondělí/</Cz>Monday
           </DayTitle>
           <CalEvent type="lecture" title="DPG" time="11:00 - 12:30">
+            Havran
+            <br />
             Teams
+            <br />
+            <Link to="https://cw.fel.cvut.cz/wiki/courses/b4m39dpg/start">
+              CourseWare
+            </Link>
           </CalEvent>
           <CalEvent type="seminar" title="APG" time="12:45 - 14:15">
             Teams
+            <br />
+            <Link to="https://cw.fel.cvut.cz/wiki/courses/b4m39apg/start">
+              CourseWare
+            </Link>
           </CalEvent>
           <CalEvent type="seminar" title="DPG" time="14:30 - 16:00">
             Teams
+            <br />
+            <SeeLecture />
           </CalEvent>
         </Day>
         <Day>
@@ -101,6 +113,7 @@ export default function FEL() {
           </CalEvent>
           <CalEvent type="seminar" title="GPU" time="14:30 - 16:00">
             <MaybeLink to={links?.GPU}>Zoom</MaybeLink>
+            <SeeLecture />
           </CalEvent>
         </Day>
         <Day>
@@ -145,8 +158,8 @@ export default function FEL() {
               </Link>
             </div>
             <Cz>
-              Vyzkouset <Link to="https://www.purrdata.net/">purrdata</Link> a{' '}
-              <Link to="https://vvvv.org">vvvv</Link>.<br />
+              <Link to="https://www.purrdata.net/">purrdata</Link> a{' '}
+              <Link to="https://vvvv.org">vvvv</Link>
             </Cz>
           </CalEvent>
           <CalEvent type="seminar" title="ITT" time="14:30 - 16:00">
@@ -181,6 +194,15 @@ const Day = styled.div({
 const DayTitle = styled.div({
   alignSelf: 'center',
 })
+
+function SeeLecture() {
+  return (
+    <div>
+      <Cz>Viz přednáška</Cz>
+      <En>See lecture</En>
+    </div>
+  )
+}
 
 function useEn() {
   const router = useRouter()
