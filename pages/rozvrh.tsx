@@ -157,10 +157,8 @@ export default function FEL() {
                 CourseWare
               </Link>
             </div>
-            <Cz>
-              <Link to="https://www.purrdata.net/">purrdata</Link> a{' '}
-              <Link to="https://vvvv.org">vvvv</Link>
-            </Cz>
+            <Link to="https://www.purrdata.net/">purrdata</Link> <Cz>a</Cz>
+            <En>and</En> <Link to="https://vvvv.org">vvvv</Link>
           </CalEvent>
           <CalEvent type="seminar" title="ITT" time="14:30 - 16:00">
             Teams
