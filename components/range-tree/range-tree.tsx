@@ -3,7 +3,6 @@ import { jsx } from '@emotion/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Resizer from '@codewitchbella/react-resizer'
 import {
-  Highlight,
   Points,
   RangeTreeProvider,
   RangeTreeState,
@@ -30,7 +29,7 @@ export function RangeTree() {
 function RangeTreeView() {
   const state = useRangeTreeState()
   const dispatch = useRangeTreeDispatch()
-  const { points, highlight } = state
+  const { points } = state
   return (
     <div>
       <button
@@ -299,6 +298,7 @@ function useSSR() {
 }
 
 function PointChart({ points }: { points: Points }) {
+  const { query } = useRangeTreeState()
   const label = useRef<HTMLDivElement>(null)
   const wrap = useRef<HTMLDivElement>(null)
   const [labelValue, setLabelValue] = useState('')
@@ -368,6 +368,33 @@ function PointChart({ points }: { points: Points }) {
           }
         }}
       >
+        {Array.from({ length: xmax + 1 }).map((_, i) => (
+          <line
+            x1={0}
+            x2={xmax}
+            y1={i}
+            y2={i}
+            style={{ stroke: 'blue', strokeWidth: 0.1 }}
+            strokeLinecap="round"
+          />
+        ))}
+        {Array.from({ length: ymax + 1 }).map((_, i) => (
+          <line
+            x1={i}
+            x2={i}
+            y1={0}
+            y2={ymax}
+            style={{ stroke: 'blue', strokeWidth: 0.1 }}
+            strokeLinecap="round"
+          />
+        ))}
+        <rect
+          x={query.xmin - 0.5}
+          y={query.ymin - 0.5}
+          width={query.xmax - query.xmin + 1}
+          height={query.ymax - query.ymin + 1}
+          fill="green"
+        />
         {points.map((point, i) => (
           <g
             key={i}
@@ -377,7 +404,7 @@ function PointChart({ points }: { points: Points }) {
               dispatch({ type: 'deletePoint', point })
             }}
           >
-            <circle r={0.5} data-point-id={i} />
+            <circle r={0.3} data-point-id={i} />
           </g>
         ))}
       </svg>
