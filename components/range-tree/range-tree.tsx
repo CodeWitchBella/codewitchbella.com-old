@@ -3,6 +3,7 @@ import { jsx } from '@emotion/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Resizer from '@codewitchbella/react-resizer'
 import {
+  Action,
   Highlight,
   Points,
   RangeTreeProvider,
@@ -25,6 +26,7 @@ function RangeTreeView() {
   const { points, highlight } = state
   const bbst = useMemo(() => makeBBST(points), [points])
   const fractal = useMemo(() => makeFractal(points), [points])
+  const nextAction = useNextAction()
   return (
     <div>
       <button
@@ -99,6 +101,19 @@ function RangeTreeView() {
           Reset highlight
         </button>
       </div>
+      <div>
+        Next action: {JSON.stringify(nextAction)}{' '}
+        <button
+          type="button"
+          onClick={() => {
+            if (nextAction) dispatch(nextAction)
+          }}
+          disabled={!nextAction}
+        >
+          Perform
+        </button>
+      </div>
+      <div>Last action: {JSON.stringify(state.action)}</div>
       <div css={{ display: 'flex' }}>
         <BBSTView bbst={bbst} highlight={highlight} />
         <Fractal fractal={fractal} highlight={highlight} />
@@ -108,6 +123,11 @@ function RangeTreeView() {
       </div>
     </div>
   )
+}
+
+function useNextAction(): Action | null {
+  const state = useRangeTreeState()
+  return { type: 'findYMin' }
 }
 
 function QueryField({ field }: { field: keyof RangeTreeState['query'] }) {
@@ -195,11 +215,10 @@ function Fractal({
   highlight: Highlight
 }) {
   const state = useRangeTreeState()
-  const highlightedNode = findHighlightedNode(
-    fractal,
-    highlight,
-    state.query.ymin,
-  )
+  const highlightedNode = useMemo(() => {
+    if (!state.highlight.ymin) return null
+    return findHighlightedNode(fractal, highlight, state.query.ymin)
+  }, [fractal, highlight, state.highlight.ymin, state.query.ymin])
   return (
     <div
       css={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}
@@ -247,10 +266,9 @@ function findHighlightedNode(
   }
   if (!start) return null
 
-  return highlight.path.reduce<FractalNode | null>(
-    (v, cur) => v?.[cur] ?? null,
-    start,
-  )
+  return highlight.path
+    .slice(1)
+    .reduce<FractalNode | null>((v, cur) => v?.[cur] ?? null, start)
 }
 
 function findFirstSameOrLarger<T>(node: FractalNode<T>, value: number) {

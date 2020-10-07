@@ -12,9 +12,11 @@ export type Highlight = {
   layer: number
   id: number
   path: readonly ('left' | 'right')[]
+  ymin: boolean
 }
 
 type StateBase = {
+  action: Action | null
   points: Points
   highlight: Highlight
   query: { xmin: number; xmax: number; ymin: number; ymax: number }
@@ -28,11 +30,13 @@ type State = StateBase & {
 }
 export type RangeTreeState = State
 const initialState: State = {
+  action: null,
   points: [],
   highlight: {
-    layer: 0,
+    layer: -1,
     id: 0,
     path: [],
+    ymin: false,
   },
   query: { xmin: 0, xmax: 0, ymin: 0, ymax: 0 },
   results: [],
@@ -49,9 +53,13 @@ type BaseAction =
   | { type: 'loadExample' }
   | { type: 'pushResult'; result: number }
   | { type: 'querySet'; key: keyof StateBase['query']; value: number }
-type Action = BaseAction | { type: 'undo' } | { type: 'redo' }
+  | { type: 'findYMin' }
+export type Action = BaseAction | { type: 'undo' } | { type: 'redo' }
 
-function baseReducer(state: StateBase, action: Action): StateBase {
+function baseReducer(
+  state: StateBase,
+  action: Action,
+): Omit<StateBase, 'action'> {
   if (action.type === 'setPoints') {
     return { ...state, points: action.points, results: [] }
   }
@@ -64,7 +72,11 @@ function baseReducer(state: StateBase, action: Action): StateBase {
     }
   }
   if (action.type === 'querySet') {
-    return { ...state, query: { ...state.query, [action.key]: action.value } }
+    return {
+      ...state,
+      query: { ...state.query, [action.key]: action.value },
+      highlight: initialState.highlight,
+    }
   }
   if (action.type === 'highlightGoLeft') {
     const h = state.highlight
@@ -113,6 +125,15 @@ function baseReducer(state: StateBase, action: Action): StateBase {
       results: [],
     }
   }
+  if (action.type === 'findYMin') {
+    return {
+      ...state,
+      highlight: {
+        ...state.highlight,
+        ymin: true,
+      },
+    }
+  }
   throw new Error('Unknown action')
 }
 
@@ -135,6 +156,7 @@ function historicReducer(cur: State, action: Action): State {
     ...next,
     historyPrev: prev,
     historyNext: null,
+    action,
   }
 }
 
