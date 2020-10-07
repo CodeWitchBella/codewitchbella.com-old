@@ -1,7 +1,10 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react'
 import {
+  createContext,
+  Dispatch,
   Fragment,
+  useContext,
   useEffect,
   useMemo,
   useReducer,
@@ -15,13 +18,14 @@ type Points = readonly Point[]
 type Highlight = {
   layer: number
   id: number
-  ymin: number
   path: readonly ('left' | 'right')[]
 }
 
 type StateBase = {
   points: Points
   highlight: Highlight
+  query: { xmin: number; xmax: number; ymin: number; ymax: number }
+  results: readonly number[]
 }
 type StatePrev = StateBase & { historyPrev: StatePrev | null }
 type StateNext = StateBase & { historyNext: StateNext | null }
@@ -34,9 +38,10 @@ const initialState: State = {
   highlight: {
     layer: 0,
     id: 0,
-    ymin: 0,
     path: [],
   },
+  query: { xmin: 0, xmax: 0, ymin: 0, ymax: 0 },
+  results: [],
   historyPrev: null,
   historyNext: null,
 }
@@ -44,31 +49,28 @@ const initialState: State = {
 type BaseAction =
   | { type: 'setPoints'; points: Points }
   | { type: 'addPoint'; point: { x: number; y: number } }
-  | { type: 'setHighlightYmin'; ymin: number }
   | { type: 'highlightGoLeft' }
   | { type: 'highlightGoRight' }
   | { type: 'highlightReset' }
+  | { type: 'loadExample' }
+  | { type: 'pushResult'; result: number }
+  | { type: 'querySet'; key: keyof StateBase['query']; value: number }
 type Action = BaseAction | { type: 'undo' } | { type: 'redo' }
 
 function baseReducer(state: StateBase, action: Action): StateBase {
   if (action.type === 'setPoints') {
-    return { ...state, points: action.points }
+    return { ...state, points: action.points, results: [] }
   }
   if (action.type === 'addPoint') {
     const maxId = state.points.reduce((a, b) => Math.max(a, b.id), 0)
     return {
       ...state,
       points: [...state.points, { ...action.point, id: maxId + 1 }],
+      results: [],
     }
   }
-  if (action.type === 'setHighlightYmin') {
-    return {
-      ...state,
-      highlight: {
-        ...state.highlight,
-        ymin: action.ymin,
-      },
-    }
+  if (action.type === 'querySet') {
+    return { ...state, query: { ...state.query, [action.key]: action.value } }
   }
   if (action.type === 'highlightGoLeft') {
     const h = state.highlight
@@ -100,6 +102,23 @@ function baseReducer(state: StateBase, action: Action): StateBase {
       highlight: initialState.highlight,
     }
   }
+  if (action.type === 'loadExample') {
+    return {
+      ...state,
+      highlight: initialState.highlight,
+      points: [
+        [3, 7],
+        [4, 6],
+        [6, 5],
+        [1, 4],
+        [5, 3],
+        [2, 2],
+        [7, 1],
+        [0, 0],
+      ].map(([x, y], i) => ({ x, y, id: i + 1 })),
+      results: [],
+    }
+  }
   throw new Error('Unknown action')
 }
 
@@ -125,102 +144,132 @@ function historicReducer(cur: State, action: Action): State {
   }
 }
 
+const dispatchContext = createContext<Dispatch<Action> | null>(null)
+function useDispatch() {
+  const dispatch = useContext(dispatchContext)
+  if (!dispatch) throw new Error('Missing dispatch')
+  return dispatch
+}
+
+const stateContext = createContext<State | null>(null)
+function useCtxState() {
+  const state = useContext(stateContext)
+  if (!state) throw new Error('Missing state')
+  return state
+}
+
 export default function RangeTree() {
   const [state, dispatch] = useReducer(historicReducer, initialState)
   const { points, highlight } = state
   const bbst = useMemo(() => makeBBST(points), [points])
   const fractal = useMemo(() => makeFractal(points), [points])
   return (
-    <div>
-      <button
-        type="button"
-        onClick={() => dispatch({ type: 'setPoints', points: [] })}
-      >
-        Remove all points
-      </button>
-      <button
-        type="button"
-        onClick={() => dispatch({ type: 'undo' })}
-        disabled={!state.historyPrev}
-      >
-        Undo
-      </button>
-      <button
-        type="button"
-        onClick={() => dispatch({ type: 'redo' })}
-        disabled={!state.historyNext}
-      >
-        Redo
-      </button>
-      <PointInput
-        onPoint={(point) => {
-          dispatch({ type: 'addPoint', point })
-        }}
-      />
-      <button
-        type="button"
-        onClick={() => {
-          dispatch({
-            type: 'setPoints',
-            points: [
-              [3, 7],
-              [4, 6],
-              [6, 5],
-              [1, 4],
-              [5, 3],
-              [2, 2],
-              [7, 1],
-              [0, 0],
-            ].map(([x, y], i) => ({ x, y, id: i + 1 })),
-          })
-        }}
-      >
-        Load example
-      </button>
-      <PointChart points={points} />
-      <div>
-        <label>
-          ymin:{' '}
-          <input
-            type="number"
-            value={highlight.ymin}
-            onChange={(evt) => {
-              const next = Number.parseInt(evt.target?.value, 10)
-              if (Number.isInteger(next))
-                dispatch({ type: 'setHighlightYmin', ymin: next })
+    <stateContext.Provider value={state}>
+      <dispatchContext.Provider value={dispatch}>
+        <div>
+          <button
+            type="button"
+            onClick={() => dispatch({ type: 'setPoints', points: [] })}
+          >
+            Remove all points
+          </button>
+          <button
+            type="button"
+            onClick={() => dispatch({ type: 'undo' })}
+            disabled={!state.historyPrev}
+          >
+            Undo
+          </button>
+          <button
+            type="button"
+            onClick={() => dispatch({ type: 'redo' })}
+            disabled={!state.historyNext}
+          >
+            Redo
+          </button>
+          <PointInput
+            onPoint={(point) => {
+              dispatch({ type: 'addPoint', point })
             }}
           />
-        </label>
-        <button
-          type="button"
-          onClick={() => {
-            dispatch({ type: 'highlightGoLeft' })
-          }}
-        >
-          Left
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            dispatch({ type: 'highlightGoRight' })
-          }}
-        >
-          Right
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            dispatch({ type: 'highlightReset' })
-          }}
-        >
-          Reset highlight
-        </button>
-      </div>
-      <div css={{ display: 'flex' }}>
-        <BBSTView bbst={bbst} highlight={highlight} />
-        <Fractal fractal={fractal} highlight={highlight} />
-      </div>
-    </div>
+          <button
+            type="button"
+            onClick={() => {
+              dispatch({ type: 'loadExample' })
+            }}
+          >
+            Load example
+          </button>
+          <PointChart points={points} />
+          <div>
+            Query:
+            <div>
+              <QueryField field="ymin" />
+              <QueryField field="ymax" />
+            </div>
+            <div>
+              <QueryField field="xmin" />
+              <QueryField field="xmax" />
+            </div>
+          </div>
+          <div>
+            Highlight:
+            <button
+              type="button"
+              onClick={() => {
+                dispatch({ type: 'highlightGoLeft' })
+              }}
+            >
+              Left
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                dispatch({ type: 'highlightGoRight' })
+              }}
+            >
+              Right
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                dispatch({ type: 'highlightReset' })
+              }}
+            >
+              Reset highlight
+            </button>
+          </div>
+          <div css={{ display: 'flex' }}>
+            <BBSTView bbst={bbst} highlight={highlight} />
+            <Fractal fractal={fractal} highlight={highlight} />
+          </div>
+          <div>
+            <div>Results: {JSON.stringify(state.results)}</div>
+          </div>
+        </div>
+      </dispatchContext.Provider>
+    </stateContext.Provider>
+  )
+}
+
+function QueryField({ field }: { field: keyof State['query'] }) {
+  const value = useCtxState().query[field]
+  const dispatch = useDispatch()
+  return (
+    <label>
+      {field}
+      {': '}
+      <input
+        type="number"
+        value={value}
+        onChange={(evt) => {
+          const next = Number.parseInt(evt.target?.value, 10)
+          if (Number.isInteger(next))
+            dispatch({ type: 'querySet', key: field, value: next })
+        }}
+        css={{ width: '5ch' }}
+      />
+    </label>
   )
 }
 
@@ -287,7 +336,12 @@ function Fractal({
   fractal: ReturnType<typeof makeFractal>
   highlight: Highlight
 }) {
-  const highlightedNode = findHighlightedNode(fractal, highlight)
+  const state = useCtxState()
+  const highlightedNode = findHighlightedNode(
+    fractal,
+    highlight,
+    state.query.ymin,
+  )
   return (
     <div
       css={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}
@@ -327,9 +381,10 @@ function Fractal({
 function findHighlightedNode(
   fractal: ReturnType<typeof makeFractal>,
   highlight: Highlight,
+  ymin: number,
 ): FractalNode | null {
   let start: FractalNode | null = fractal.root
-  while (start && start.value < highlight.ymin) {
+  while (start && start.value < ymin) {
     start = start.sibRight
   }
   if (!start) return null
