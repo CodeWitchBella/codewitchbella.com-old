@@ -44,11 +44,7 @@ export function makeFractal(points: Points) {
     layers.push(newLayer)
     layer = newLayer
   }
-  for (const l of layers) {
-    for (const n of l) {
-      delete (n as any).x
-    }
-  }
+
   return { layers: layers.reverse(), root: layer[0] }
 }
 
@@ -83,6 +79,7 @@ export type FractalNode<Ext = {}> = Ext & {
   sibRight: FractalNode<Ext> | null
   value: number
   key: number
+  x: number
 }
 
 export function comesFrom(node: FractalNode, from: FractalNode | null) {
@@ -93,7 +90,7 @@ export function comesFrom(node: FractalNode, from: FractalNode | null) {
   return false
 }
 
-export function findHighlightedNode(
+export function findHighlightedNodeFractal(
   fractal: ReturnType<typeof makeFractal>,
   highlight: Highlight,
   ymin: number,

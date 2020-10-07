@@ -22,11 +22,14 @@ export type StateBase = {
   points: Points
   highlight: Highlight
   query: { xmin: number; xmax: number; ymin: number; ymax: number }
-  results: readonly number[]
+  results: readonly { x: number; y: number }[]
 
   searchState: {
     status: keyof typeof nextState
     splitPoint: Highlight
+    reportBacktrack: Highlight
+    reportBacktrackForm: 'xmin' | 'xmax' | 'done'
+    reportedSub: boolean
   }
 }
 
@@ -57,26 +60,25 @@ type State = StateBase &
     historyNext: StateNext | null
   }
 export type RangeTreeState = State
-const initialState: State = {
+const initialHighlight = {
+  layer: -1,
+  id: 0,
+  path: [],
+  ymin: false,
+}
+export const initialState: State = {
   points: [],
-  highlight: {
-    layer: -1,
-    id: 0,
-    path: [],
-    ymin: false,
-  },
+  highlight: initialHighlight,
   query: { xmin: 0, xmax: 0, ymin: 0, ymax: 0 },
   results: [],
   historyPrev: null,
   historyNext: null,
   searchState: {
     status: 'init',
-    splitPoint: {
-      layer: -1,
-      id: 0,
-      path: [],
-      ymin: false,
-    },
+    splitPoint: initialHighlight,
+    reportBacktrack: initialHighlight,
+    reportBacktrackForm: 'xmin',
+    reportedSub: false,
   },
   derived: {
     fractal: makeFractal([]),

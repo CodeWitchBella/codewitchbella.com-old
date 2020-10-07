@@ -13,7 +13,11 @@ import {
 import { ArrowEnd, ArrowStart } from './range-tree-arrow'
 import styled from '@emotion/styled'
 import { nextState } from './range-tree-next-step'
-import { comesFrom, findHighlightedNode, getFractalNodes } from './derived'
+import {
+  comesFrom,
+  findHighlightedNodeFractal,
+  getFractalNodes,
+} from './derived'
 
 export function RangeTree() {
   return (
@@ -138,7 +142,7 @@ function Fractal() {
   const { fractal } = state.derived
   const highlightedNode = useMemo(() => {
     if (!state.highlight.ymin) return null
-    return findHighlightedNode(fractal, highlight, state.query.ymin)
+    return findHighlightedNodeFractal(fractal, highlight, state.query.ymin)
   }, [fractal, highlight, state.highlight.ymin, state.query.ymin])
   return (
     <TreeRoot>
@@ -202,7 +206,7 @@ function BBSTView() {
   const {
     derived: { bbst },
     highlight,
-    searchState: { splitPoint },
+    searchState: { splitPoint, reportBacktrack },
   } = useRangeTreeState()
   return (
     <div css={{ display: 'flex' }}>
@@ -228,6 +232,10 @@ function BBSTView() {
                     textDecoration:
                       splitPoint.layer === li && splitPoint.id === ni
                         ? 'underline'
+                        : undefined,
+                    fontWeight:
+                      reportBacktrack.layer === li && reportBacktrack.id === ni
+                        ? 'bold'
                         : undefined,
                     position: 'relative',
                   },
