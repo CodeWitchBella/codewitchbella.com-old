@@ -13,12 +13,7 @@ import {
 import { ArrowEnd, ArrowStart } from './range-tree-arrow'
 import styled from '@emotion/styled'
 import { nextState } from './range-tree-next-step'
-import {
-  comesFrom,
-  findHighlightedNode,
-  getFractalNodes,
-  makeFractal,
-} from './derived'
+import { comesFrom, findHighlightedNode, getFractalNodes } from './derived'
 
 export function RangeTree() {
   return (
@@ -32,7 +27,6 @@ function RangeTreeView() {
   const state = useRangeTreeState()
   const dispatch = useRangeTreeDispatch()
   const { points, highlight } = state
-  const bbst = useMemo(() => makeBBST(points), [points])
   return (
     <div>
       <button
@@ -121,7 +115,7 @@ function RangeTreeView() {
       </div>
       <div>Last action: {JSON.stringify(state.action)}</div>
       <div css={{ display: 'flex', gap: '2rem' }}>
-        <BBSTView bbst={bbst} highlight={highlight} />
+        <BBSTView highlight={highlight} />
         <Fractal highlight={highlight} />
       </div>
       <div>
@@ -230,42 +224,10 @@ function Fractal({ highlight }: { highlight: Highlight }) {
   )
 }
 
-type BBSTNode = { value: number; left: BBSTNode | null; right: BBSTNode | null }
-
-function makeBBST(points: Points) {
-  let layer = points
-    .map(({ x }): BBSTNode => ({ value: x, left: null, right: null }))
-    .sort(({ value: a }, { value: b }) => a - b)
-  const layers: BBSTNode[][] = [layer]
-  while (layer.length > 1) {
-    const newLayer: BBSTNode[] = []
-    for (let i = 0; i < layer.length; i += 2) {
-      const left = layer[i]
-      const right = i + 1 >= layer.length ? null : layer[i + 1]
-      newLayer.push({ value: findMax(left) ?? left.value, left, right })
-    }
-    layers.unshift(newLayer)
-    layer = newLayer
-  }
-  return { root: layer[0], layers }
-}
-
-function findMax(node: BBSTNode | null): number | null {
-  if (!node) return null
-  return Math.max(
-    node.value,
-    findMax(node.left) ?? Number.NEGATIVE_INFINITY,
-    findMax(node.right) ?? Number.NEGATIVE_INFINITY,
-  )
-}
-
-function BBSTView({
-  bbst,
-  highlight,
-}: {
-  bbst: ReturnType<typeof makeBBST>
-  highlight: Highlight
-}) {
+function BBSTView({ highlight }: { highlight: Highlight }) {
+  const {
+    derived: { bbst },
+  } = useRangeTreeState()
   return (
     <div css={{ display: 'flex' }}>
       <TreeRoot>

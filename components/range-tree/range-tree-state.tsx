@@ -5,6 +5,7 @@ import {
   useContext,
   useReducer,
 } from 'react'
+import { makeBBST } from './bbst'
 import { makeFractal } from './derived'
 import { nextState } from './range-tree-next-step'
 
@@ -32,6 +33,7 @@ export type StateBase = {
 export type DerivedState = {
   derived: {
     fractal: ReturnType<typeof makeFractal>
+    bbst: ReturnType<typeof makeBBST>
   }
 }
 
@@ -39,12 +41,12 @@ function derive(
   cur: Omit<StateBase, 'action'>,
   cache: (StateBase & DerivedState) | null,
 ): DerivedState['derived'] {
-  return {
-    fractal:
-      cache?.points === cur.points
-        ? cache.derived.fractal
-        : makeFractal(cur.points),
-  }
+  return cache?.points === cur.points
+    ? cache['derived']
+    : {
+        fractal: makeFractal(cur.points),
+        bbst: makeBBST(cur.points),
+      }
 }
 
 type StatePrev = StateBase & { historyPrev: StatePrev | null }
@@ -73,6 +75,7 @@ const initialState: State = {
   },
   derived: {
     fractal: makeFractal([]),
+    bbst: makeBBST([]),
   },
 }
 
