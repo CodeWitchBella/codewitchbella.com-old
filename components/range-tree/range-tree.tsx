@@ -11,6 +11,8 @@ import {
   useRangeTreeDispatch,
   useRangeTreeState,
 } from './range-tree-state'
+import { ArrowEnd, ArrowStart } from './range-tree-arrow'
+import styled from '@emotion/styled'
 
 export function RangeTree() {
   return (
@@ -114,7 +116,7 @@ function RangeTreeView() {
         </button>
       </div>
       <div>Last action: {JSON.stringify(state.action)}</div>
-      <div css={{ display: 'flex' }}>
+      <div css={{ display: 'flex', gap: '2rem' }}>
         <BBSTView bbst={bbst} highlight={highlight} />
         <Fractal fractal={fractal} highlight={highlight} />
       </div>
@@ -157,10 +159,12 @@ type FractalNode<Ext = {}> = Ext & {
   right: FractalNode<Ext> | null
   sibRight: FractalNode<Ext> | null
   value: number
+  key: number
 }
 
 function makeFractal(points: Points) {
   type FractalNodeWork = FractalNode<{ x: number; id: number }>
+  let keyGen = 1
   let layer = [...points]
     .sort(({ x: a }, { x: b }) => a - b)
     .map(
@@ -171,6 +175,7 @@ function makeFractal(points: Points) {
         left: null,
         right: null,
         sibRight: null,
+        key: ++keyGen,
       }),
     )
 
@@ -183,11 +188,13 @@ function makeFractal(points: Points) {
       const nodes = [...getFractalValues(left), ...getFractalValues(right)]
         .sort(({ value: a }, { value: b }) => a - b)
         .map(
+          // eslint-disable-next-line no-loop-func
           (node, i, list): FractalNodeWork => ({
             ...node,
             // this could be more optimal but :shrug:
             left: findFirstSameOrLarger(left, node.value),
             right: findFirstSameOrLarger(right, node.value),
+            key: ++keyGen,
           }),
         )
       let j = 0
@@ -207,6 +214,19 @@ function makeFractal(points: Points) {
   return { layers: layers.reverse(), root: layer[0] }
 }
 
+const TreeRoot = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'stretch',
+  gap: '.5rem',
+})
+
+const TreeLine = styled.div({
+  display: 'flex',
+  justifyContent: 'space-evenly',
+  gap: '.25rem',
+})
+
 function Fractal({
   fractal,
   highlight,
@@ -220,29 +240,50 @@ function Fractal({
     return findHighlightedNode(fractal, highlight, state.query.ymin)
   }, [fractal, highlight, state.highlight.ymin, state.query.ymin])
   return (
-    <div
-      css={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}
-    >
+    <TreeRoot>
       {fractal.layers.map((layer, layerKey) => (
-        <div
-          key={layerKey}
-          css={{
-            display: 'flex',
-            justifyContent: 'space-evenly',
-            gap: '.25rem',
-          }}
-        >
+        <TreeLine key={layerKey}>
           {layer.map((layerStart, ni) => (
             <div key={ni}>
               [
               {getFractalNodes(layerStart).map((node, i, list) => (
                 <>
                   <span
-                    css={
-                      node === highlightedNode ? { background: 'yellow' } : {}
-                    }
+                    css={[
+                      node === highlightedNode ? { background: 'yellow' } : {},
+                      {
+                        position: 'relative',
+                        cursor: 'pointer',
+                        padding: 2,
+                        '.arrow': {
+                          pointerEvents: 'none',
+                          opacity: comesFrom(node, highlightedNode) ? 1 : 0,
+                        },
+                        ':hover .arrow': {
+                          opacity: 1,
+                        },
+                      },
+                    ]}
                   >
                     {node.value}
+                    <ArrowEnd
+                      id={`frac:${node.key}`}
+                      css={{ position: 'absolute', top: 0, left: '50%' }}
+                    />
+                    {node.left ? (
+                      <ArrowStart
+                        id={`frac:${node.left.key}`}
+                        css={{ position: 'absolute', bottom: 0, left: '50%' }}
+                        className="arrow"
+                      />
+                    ) : null}
+                    {node.right ? (
+                      <ArrowStart
+                        id={`frac:${node.right.key}`}
+                        css={{ position: 'absolute', bottom: 0, left: '50%' }}
+                        className="arrow"
+                      />
+                    ) : null}
                   </span>
                   {i !== list.length - 1 ? ',' : null}
                 </>
@@ -250,11 +291,19 @@ function Fractal({
               ]
             </div>
           ))}
-        </div>
+        </TreeLine>
       ))}
-    </div>
+    </TreeRoot>
   )
 }
+function comesFrom(node: FractalNode, from: FractalNode | null) {
+  if (from === null) return false
+  if (node === from) return true
+  if (comesFrom(node, from.left)) return true
+  if (comesFrom(node, from.right)) return true
+  return false
+}
+
 function findHighlightedNode(
   fractal: ReturnType<typeof makeFractal>,
   highlight: Highlight,
@@ -333,39 +382,44 @@ function BBSTView({
 }) {
   return (
     <div css={{ display: 'flex' }}>
-      <div
-        css={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'stretch',
-        }}
-      >
+      <TreeRoot>
         {bbst.layers.map((layer, li) => (
           <div
             key={li}
             css={{
               display: 'flex',
-              justifyContent: 'space-between',
+              justifyContent: 'space-evenly',
               gap: '.5rem',
             }}
           >
-            <span />
             {layer.map((node, ni) => (
               <span
                 key={ni}
-                css={
+                css={[
                   highlight.layer === li && highlight.id === ni
                     ? { background: 'yellow' }
-                    : {}
-                }
+                    : {},
+                  { position: 'relative' },
+                ]}
               >
                 {node.value}
+                <ArrowEnd
+                  id={`bbst:${li}:${ni}`}
+                  css={{ position: 'absolute', top: 0, left: '50%' }}
+                />
+                <ArrowStart
+                  id={`bbst:${li + 1}:${ni * 2}`}
+                  css={{ position: 'absolute', bottom: 0, left: '50%' }}
+                />
+                <ArrowStart
+                  id={`bbst:${li + 1}:${ni * 2 + 1}`}
+                  css={{ position: 'absolute', bottom: 0, left: '50%' }}
+                />
               </span>
             ))}
-            <span />
           </div>
         ))}
-      </div>
+      </TreeRoot>
     </div>
   )
 }
