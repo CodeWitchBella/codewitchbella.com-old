@@ -5,6 +5,8 @@ import {
   useContext,
   useReducer,
 } from 'react'
+import { makeFractal } from './derived'
+import { nextState } from './range-tree-next-step'
 
 type Point = { x: number; y: number; id: number }
 export type Points = readonly Point[]
@@ -15,19 +17,43 @@ export type Highlight = {
   ymin: boolean
 }
 
-type StateBase = {
+export type StateBase = {
   action: Action | null
   points: Points
   highlight: Highlight
   query: { xmin: number; xmax: number; ymin: number; ymax: number }
   results: readonly number[]
+
+  searchState: {
+    status: keyof typeof nextState
+  }
 }
+
+export type DerivedState = {
+  derived: {
+    fractal: ReturnType<typeof makeFractal>
+  }
+}
+
+function derive(
+  cur: Omit<StateBase, 'action'>,
+  cache: (StateBase & DerivedState) | null,
+): DerivedState['derived'] {
+  return {
+    fractal:
+      cache?.points === cur.points
+        ? cache.derived.fractal
+        : makeFractal(cur.points),
+  }
+}
+
 type StatePrev = StateBase & { historyPrev: StatePrev | null }
 type StateNext = StateBase & { historyNext: StateNext | null }
-type State = StateBase & {
-  historyPrev: StatePrev | null
-  historyNext: StateNext | null
-}
+type State = StateBase &
+  DerivedState & {
+    historyPrev: StatePrev | null
+    historyNext: StateNext | null
+  }
 export type RangeTreeState = State
 const initialState: State = {
   action: null,
@@ -42,6 +68,12 @@ const initialState: State = {
   results: [],
   historyPrev: null,
   historyNext: null,
+  searchState: {
+    status: 'init',
+  },
+  derived: {
+    fractal: makeFractal([]),
+  },
 }
 
 type BaseAction =
@@ -54,6 +86,7 @@ type BaseAction =
   | { type: 'pushResult'; result: number }
   | { type: 'querySet'; key: keyof StateBase['query']; value: number }
   | { type: 'findYMin' }
+  | { type: 'step' }
 export type Action = BaseAction | { type: 'undo' } | { type: 'redo' }
 
 function baseReducer(
@@ -134,6 +167,9 @@ function baseReducer(
       },
     }
   }
+  if (action.type === 'step') {
+    return nextState[state.searchState.status].reduce(state)
+  }
   throw new Error('Unknown action')
 }
 
@@ -142,13 +178,13 @@ function historicReducer(cur: State, action: Action): State {
     const prev = cur.historyPrev
     if (!prev) return cur
     const { historyPrev: deleted, ...next } = cur
-    return { ...prev, historyNext: next }
+    return { ...prev, historyNext: next, derived: derive(prev, cur) }
   }
   if (action.type === 'redo') {
     const next = cur.historyNext
     if (!next) return cur
     const { historyNext: deleted, ...prev } = cur
-    return { ...next, historyPrev: prev }
+    return { ...next, historyPrev: prev, derived: derive(next, cur) }
   }
   const next = baseReducer(cur, action)
   const { historyNext: deleted, ...prev } = cur
@@ -157,6 +193,7 @@ function historicReducer(cur: State, action: Action): State {
     historyPrev: prev,
     historyNext: null,
     action,
+    derived: derive(next, prev),
   }
 }
 

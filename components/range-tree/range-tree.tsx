@@ -3,7 +3,6 @@ import { jsx } from '@emotion/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Resizer from '@codewitchbella/react-resizer'
 import {
-  Action,
   Highlight,
   Points,
   RangeTreeProvider,
@@ -13,6 +12,13 @@ import {
 } from './range-tree-state'
 import { ArrowEnd, ArrowStart } from './range-tree-arrow'
 import styled from '@emotion/styled'
+import { nextState } from './range-tree-next-step'
+import {
+  comesFrom,
+  findHighlightedNode,
+  getFractalNodes,
+  makeFractal,
+} from './derived'
 
 export function RangeTree() {
   return (
@@ -27,8 +33,6 @@ function RangeTreeView() {
   const dispatch = useRangeTreeDispatch()
   const { points, highlight } = state
   const bbst = useMemo(() => makeBBST(points), [points])
-  const fractal = useMemo(() => makeFractal(points), [points])
-  const nextAction = useNextAction()
   return (
     <div>
       <button
@@ -104,13 +108,13 @@ function RangeTreeView() {
         </button>
       </div>
       <div>
-        Next action: {JSON.stringify(nextAction)}{' '}
+        Next action: {nextState[state.searchState.status].description}{' '}
         <button
           type="button"
           onClick={() => {
-            if (nextAction) dispatch(nextAction)
+            dispatch({ type: 'step' })
           }}
-          disabled={!nextAction}
+          disabled={state.searchState.status === 'done'}
         >
           Perform
         </button>
@@ -118,18 +122,13 @@ function RangeTreeView() {
       <div>Last action: {JSON.stringify(state.action)}</div>
       <div css={{ display: 'flex', gap: '2rem' }}>
         <BBSTView bbst={bbst} highlight={highlight} />
-        <Fractal fractal={fractal} highlight={highlight} />
+        <Fractal highlight={highlight} />
       </div>
       <div>
         <div>Results: {JSON.stringify(state.results)}</div>
       </div>
     </div>
   )
-}
-
-function useNextAction(): Action | null {
-  const state = useRangeTreeState()
-  return { type: 'findYMin' }
 }
 
 function QueryField({ field }: { field: keyof RangeTreeState['query'] }) {
@@ -153,67 +152,6 @@ function QueryField({ field }: { field: keyof RangeTreeState['query'] }) {
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type FractalNode<Ext = {}> = Ext & {
-  left: FractalNode<Ext> | null
-  right: FractalNode<Ext> | null
-  sibRight: FractalNode<Ext> | null
-  value: number
-  key: number
-}
-
-function makeFractal(points: Points) {
-  type FractalNodeWork = FractalNode<{ x: number; id: number }>
-  let keyGen = 1
-  let layer = [...points]
-    .sort(({ x: a }, { x: b }) => a - b)
-    .map(
-      (point): FractalNodeWork => ({
-        x: point.x,
-        value: point.y,
-        id: point.id,
-        left: null,
-        right: null,
-        sibRight: null,
-        key: ++keyGen,
-      }),
-    )
-
-  const layers: FractalNode[][] = [layer]
-  while (layer.length > 1) {
-    const newLayer: FractalNodeWork[] = []
-    for (let i = 0; i < layer.length; i += 2) {
-      const left = layer[i]
-      const right: FractalNodeWork | null = layer[i + 1] ?? null
-      const nodes = [...getFractalValues(left), ...getFractalValues(right)]
-        .sort(({ value: a }, { value: b }) => a - b)
-        .map(
-          // eslint-disable-next-line no-loop-func
-          (node, i, list): FractalNodeWork => ({
-            ...node,
-            // this could be more optimal but :shrug:
-            left: findFirstSameOrLarger(left, node.value),
-            right: findFirstSameOrLarger(right, node.value),
-            key: ++keyGen,
-          }),
-        )
-      let j = 0
-      for (const node of nodes) {
-        node.sibRight = nodes[++j] ?? null
-      }
-      newLayer.push(nodes[0])
-    }
-    layers.push(newLayer)
-    layer = newLayer
-  }
-  for (const l of layers) {
-    for (const n of l) {
-      delete (n as any).x
-    }
-  }
-  return { layers: layers.reverse(), root: layer[0] }
-}
-
 const TreeRoot = styled.div({
   display: 'flex',
   flexDirection: 'column',
@@ -227,14 +165,9 @@ const TreeLine = styled.div({
   gap: '.25rem',
 })
 
-function Fractal({
-  fractal,
-  highlight,
-}: {
-  fractal: ReturnType<typeof makeFractal>
-  highlight: Highlight
-}) {
+function Fractal({ highlight }: { highlight: Highlight }) {
   const state = useRangeTreeState()
+  const { fractal } = state.derived
   const highlightedNode = useMemo(() => {
     if (!state.highlight.ymin) return null
     return findHighlightedNode(fractal, highlight, state.query.ymin)
@@ -295,53 +228,6 @@ function Fractal({
       ))}
     </TreeRoot>
   )
-}
-function comesFrom(node: FractalNode, from: FractalNode | null) {
-  if (from === null) return false
-  if (node === from) return true
-  if (comesFrom(node, from.left)) return true
-  if (comesFrom(node, from.right)) return true
-  return false
-}
-
-function findHighlightedNode(
-  fractal: ReturnType<typeof makeFractal>,
-  highlight: Highlight,
-  ymin: number,
-): FractalNode | null {
-  let start: FractalNode | null = fractal.root
-  while (start && start.value < ymin) {
-    start = start.sibRight
-  }
-  if (!start) return null
-
-  return highlight.path
-    .slice(1)
-    .reduce<FractalNode | null>((v, cur) => v?.[cur] ?? null, start)
-}
-
-function findFirstSameOrLarger<T>(node: FractalNode<T>, value: number) {
-  for (let n: FractalNode<T> | null = node; n; n = n.sibRight) {
-    if (n.value >= value) return n
-  }
-  return null
-}
-
-function getFractalValues<T>(a: FractalNode<T> | null): FractalNode<T>[] {
-  return getFractalNodes(a).map((node) => ({
-    ...node,
-    left: null,
-    right: null,
-    sibRight: null,
-  }))
-}
-
-function getFractalNodes<T>(a: FractalNode<T> | null): FractalNode<T>[] {
-  const nodes: FractalNode<T>[] = []
-  for (let node: FractalNode<T> | null = a; node; node = node.sibRight) {
-    nodes.push(node)
-  }
-  return nodes
 }
 
 type BBSTNode = { value: number; left: BBSTNode | null; right: BBSTNode | null }
