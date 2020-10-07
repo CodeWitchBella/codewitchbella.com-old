@@ -1,6 +1,13 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react'
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Fragment,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 import Resizer from '@codewitchbella/react-resizer'
 
 type Point = { x: number; y: number; id: number }
@@ -11,34 +18,139 @@ type Highlight = {
   ymin: number
   path: readonly ('left' | 'right')[]
 }
-export default function RangeTree() {
-  const [points, setPoints] = useState<Points>([])
-  const bbst = useMemo(() => makeBBST(points), [points])
-  const fractal = useMemo(() => makeFractal(points), [points])
-  const [highlight, setHighlight] = useState<Highlight>({
+
+type StateBase = {
+  points: Points
+  highlight: Highlight
+}
+type StatePrev = StateBase & { historyPrev: StatePrev | null }
+type StateNext = StateBase & { historyNext: StateNext | null }
+type State = StateBase & {
+  historyPrev: StatePrev | null
+  historyNext: StateNext | null
+}
+const initialState: State = {
+  points: [],
+  highlight: {
     layer: 0,
     id: 0,
     ymin: 0,
     path: [],
-  })
+  },
+  historyPrev: null,
+  historyNext: null,
+}
+
+type BaseAction =
+  | { type: 'setPoints'; points: Points }
+  | { type: 'addPoint'; point: { x: number; y: number } }
+  | { type: 'setHighlightYmin'; ymin: number }
+  | { type: 'highlightGoLeft' }
+  | { type: 'highlightGoRight' }
+  | { type: 'highlightReset' }
+type Action = BaseAction | { type: 'undo' } | { type: 'redo' }
+
+function baseReducer(state: StateBase, action: Action): StateBase {
+  if (action.type === 'setPoints') {
+    return { ...state, points: action.points }
+  }
+  if (action.type === 'addPoint') {
+    const maxId = state.points.reduce((a, b) => Math.max(a, b.id), 0)
+    return {
+      ...state,
+      points: [...state.points, { ...action.point, id: maxId + 1 }],
+    }
+  }
+  if (action.type === 'setHighlightYmin') {
+    return {
+      ...state,
+      highlight: {
+        ...state.highlight,
+        ymin: action.ymin,
+      },
+    }
+  }
+  if (action.type === 'highlightGoLeft') {
+    const h = state.highlight
+    return {
+      ...state,
+      highlight: {
+        ...h,
+        path: [...h.path, 'left'],
+        layer: h.layer + 1,
+        id: h.id * 2,
+      },
+    }
+  }
+  if (action.type === 'highlightGoRight') {
+    const h = state.highlight
+    return {
+      ...state,
+      highlight: {
+        ...h,
+        path: [...h.path, 'right'],
+        layer: h.layer + 1,
+        id: h.id * 2 + 1,
+      },
+    }
+  }
+  if (action.type === 'highlightReset') {
+    return {
+      ...state,
+      highlight: initialState.highlight,
+    }
+  }
+  throw new Error('Unknown action')
+}
+
+function historicReducer(cur: State, action: Action): State {
+  if (action.type === 'undo') {
+    const prev = cur.historyPrev
+    if (!prev) return cur
+    const { historyPrev: deleted, ...next } = cur
+    return { ...prev, historyNext: next }
+  }
+  if (action.type === 'redo') {
+    const next = cur.historyNext
+    if (!next) return cur
+    const { historyNext: deleted, ...prev } = cur
+    return { ...next, historyPrev: prev }
+  }
+  const next = baseReducer(cur, action)
+  const { historyNext: deleted, ...prev } = cur
+  return {
+    ...next,
+    historyPrev: prev,
+    historyNext: null,
+  }
+}
+
+export default function RangeTree() {
+  const [{ points, highlight }, dispatch] = useReducer(
+    historicReducer,
+    initialState,
+  )
+  const bbst = useMemo(() => makeBBST(points), [points])
+  const fractal = useMemo(() => makeFractal(points), [points])
   return (
     <div>
-      <button type="button" onClick={() => setPoints([])}>
+      <button
+        type="button"
+        onClick={() => dispatch({ type: 'setPoints', points: [] })}
+      >
         Remove all points
       </button>
       <PointInput
         onPoint={(point) => {
-          setPoints((p) => [
-            ...p,
-            { ...point, id: p.reduce((b, { id }) => Math.max(id, b), 0) + 1 },
-          ])
+          dispatch({ type: 'addPoint', point })
         }}
       />
       <button
         type="button"
         onClick={() => {
-          setPoints(
-            [
+          dispatch({
+            type: 'setPoints',
+            points: [
               [3, 7],
               [4, 6],
               [6, 5],
@@ -48,7 +160,7 @@ export default function RangeTree() {
               [7, 1],
               [0, 0],
             ].map(([x, y], i) => ({ x, y, id: i + 1 })),
-          )
+          })
         }}
       >
         Load example
@@ -63,22 +175,14 @@ export default function RangeTree() {
             onChange={(evt) => {
               const next = Number.parseInt(evt.target?.value, 10)
               if (Number.isInteger(next))
-                setHighlight((h) => ({
-                  ...h,
-                  ymin: next,
-                }))
+                dispatch({ type: 'setHighlightYmin', ymin: next })
             }}
           />
         </label>
         <button
           type="button"
           onClick={() => {
-            setHighlight((h) => ({
-              layer: h.layer + 1,
-              id: h.id * 2,
-              ymin: h.ymin,
-              path: [...h.path, 'left'],
-            }))
+            dispatch({ type: 'highlightGoLeft' })
           }}
         >
           Left
@@ -86,15 +190,18 @@ export default function RangeTree() {
         <button
           type="button"
           onClick={() => {
-            setHighlight((h) => ({
-              layer: h.layer + 1,
-              id: h.id * 2 + 1,
-              ymin: h.ymin,
-              path: [...h.path, 'right'],
-            }))
+            dispatch({ type: 'highlightGoRight' })
           }}
         >
           Right
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            dispatch({ type: 'highlightReset' })
+          }}
+        >
+          Reset highlight
         </button>
       </div>
       <div css={{ display: 'flex' }}>
