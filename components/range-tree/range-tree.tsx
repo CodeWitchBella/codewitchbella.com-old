@@ -66,7 +66,6 @@ function RangeTreeView() {
       >
         Load example
       </button>
-      <PointChart points={points} />
       <div>
         Query:
         <div>
@@ -78,26 +77,50 @@ function RangeTreeView() {
           <QueryField field="xmax" />
         </div>
       </div>
-      <div>
-        Next action:
-        <button
-          type="button"
-          onClick={() => {
-            dispatch({ type: 'step' })
-          }}
-          disabled={state.searchState.status === 'done'}
-        >
-          Perform
-        </button>
-        {nextState[state.searchState.status].description}{' '}
-      </div>
-      <div css={{ display: 'flex', gap: '2rem' }}>
-        <BBSTView />
-        <Fractal />
-      </div>
-      <div>
-        <div>Results: {JSON.stringify(state.results)}</div>
-      </div>
+      <PointChart points={points} />
+
+      {state.points.length > 0 ? (
+        <>
+          <div>
+            Next action:
+            <button
+              type="button"
+              onClick={() => {
+                dispatch({ type: 'step' })
+              }}
+              disabled={state.searchState.status === 'done'}
+            >
+              Perform
+            </button>
+            {nextState[state.searchState.status].description}{' '}
+          </div>
+          <div css={{ display: 'flex', gap: '2rem' }}>
+            <BBSTView />
+            <Fractal />
+            <div>
+              <div>Legend</div>
+              <div>
+                Active node <span css={{ background: 'yellow' }}>x</span>
+              </div>
+              <div>
+                Split point <span css={{ textDecoration: 'underline' }}>x</span>
+              </div>
+              <div>
+                xmin/xmax search position{' '}
+                <span css={{ fontWeight: 'bold' }}>x</span>
+              </div>
+            </div>
+          </div>
+          <div css={{ minHeight: '100vh' }}>
+            Results:{' '}
+            {state.results.map(({ x, y }, i) => (
+              <div key={i}>
+                {x}:{y}
+              </div>
+            ))}
+          </div>
+        </>
+      ) : null}
     </div>
   )
 }
