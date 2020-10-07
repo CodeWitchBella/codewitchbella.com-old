@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Resizer from '@codewitchbella/react-resizer'
 
 export default function RangeTreeE() {
@@ -19,10 +19,72 @@ type Point = { x: number; y: number }
 type Points = readonly Point[]
 function RangeTree() {
   const [points, setPoints] = useState<Points>([])
+  const bbst = useMemo(() => makeBBST(points), [points])
   return (
     <div>
       <PointInput onPoint={(point) => setPoints((p) => [...p, point])} />
       <PointChart points={points} />
+      <BBSTView bbst={bbst} />
+    </div>
+  )
+}
+
+type BBSTNode = { value: number; left: BBSTNode | null; right: BBSTNode | null }
+
+function makeBBST(points: Points) {
+  let layer = points
+    .map(({ x }): BBSTNode => ({ value: x, left: null, right: null }))
+    .sort(({ value: a }, { value: b }) => a - b)
+  const layers: BBSTNode[][] = [layer]
+  while (layer.length > 1) {
+    const newLayer: BBSTNode[] = []
+    for (let i = 0; i < layer.length; i += 2) {
+      const left = layer[i]
+      const right = i + 1 >= layer.length ? null : layer[i + 1]
+      newLayer.push({ value: findMax(left) ?? left.value, left, right })
+    }
+    layers.unshift(newLayer)
+    layer = newLayer
+  }
+  return { root: layer[0], layers }
+}
+
+function findMax(node: BBSTNode | null): number | null {
+  if (!node) return null
+  return Math.max(
+    node.value,
+    findMax(node.left) ?? Number.NEGATIVE_INFINITY,
+    findMax(node.right) ?? Number.NEGATIVE_INFINITY,
+  )
+}
+
+function BBSTView(props: { bbst: ReturnType<typeof makeBBST> }) {
+  return (
+    <div css={{ display: 'flex' }}>
+      <div
+        css={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+        }}
+      >
+        {props.bbst.layers.map((layer, li) => (
+          <div
+            key={li}
+            css={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: '.5rem',
+            }}
+          >
+            <span />
+            {layer.map((node, ni) => (
+              <span key={ni}>{node.value}</span>
+            ))}
+            <span />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -70,7 +132,7 @@ function PointChart({ points }: { points: Points }) {
           position: 'absolute',
           background: 'lightgray',
         }}
-        viewBox={`-2 -2 ${xmax + 3} ${ymax + 3}`}
+        viewBox={`-1 -1 ${xmax + 2} ${ymax + 2}`}
         onPointerMove={(evt) => {
           const now = Date.now()
           if (!bbRef.current || now - bbRef.current.time > 100)
@@ -111,7 +173,7 @@ function PointChart({ points }: { points: Points }) {
       >
         {points.map(({ x, y }, i) => (
           <g key={i} css={{ ':hover': {} }} transform={`translate(${x}, ${y})`}>
-            <circle cx={-0.5} cy={-0.5} r={1} data-point-id={i} />
+            <circle r={0.5} data-point-id={i} />
           </g>
         ))}
       </svg>
@@ -151,6 +213,8 @@ function PointInput({ onPoint }: { onPoint: (point: Point) => void }) {
         const sy = data.get('y')
         console.log({ sx, sy })
         evt.currentTarget.reset()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(evt.currentTarget.querySelector('input[name=x]') as any)?.focus?.()
         if (typeof sx !== 'string' || typeof sy !== 'string') return
         const x = Number.parseInt(sx, 10)
         const y = Number.parseInt(sy, 10)
