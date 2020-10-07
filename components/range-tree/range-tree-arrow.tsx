@@ -33,7 +33,7 @@ export function ArrowStart({
     console.log(id)
     console.log(dir.x, dir.y, rot)
     if (dir.x < 0) rot += 180
-    startEl.style.transform = `rotate(${rot}deg)`
+    startEl.style.transform = `rotate(${rot}deg) translateY(-0.5px)`
     return () => {
       startEl.style.width = ''
       startEl.style.transform = ''
