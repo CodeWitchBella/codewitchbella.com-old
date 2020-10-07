@@ -19,7 +19,6 @@ export type Highlight = {
 }
 
 export type StateBase = {
-  action: Action | null
   points: Points
   highlight: Highlight
   query: { xmin: number; xmax: number; ymin: number; ymax: number }
@@ -27,6 +26,7 @@ export type StateBase = {
 
   searchState: {
     status: keyof typeof nextState
+    splitPoint: Highlight
   }
 }
 
@@ -38,7 +38,7 @@ export type DerivedState = {
 }
 
 function derive(
-  cur: Omit<StateBase, 'action'>,
+  cur: StateBase,
   cache: (StateBase & DerivedState) | null,
 ): DerivedState['derived'] {
   return cache?.points === cur.points
@@ -58,7 +58,6 @@ type State = StateBase &
   }
 export type RangeTreeState = State
 const initialState: State = {
-  action: null,
   points: [],
   highlight: {
     layer: -1,
@@ -72,6 +71,12 @@ const initialState: State = {
   historyNext: null,
   searchState: {
     status: 'init',
+    splitPoint: {
+      layer: -1,
+      id: 0,
+      path: [],
+      ymin: false,
+    },
   },
   derived: {
     fractal: makeFractal([]),
@@ -81,10 +86,8 @@ const initialState: State = {
 
 type BaseAction =
   | { type: 'setPoints'; points: Points }
+  | { type: 'deletePoint'; point: any }
   | { type: 'addPoint'; point: { x: number; y: number } }
-  | { type: 'highlightGoLeft' }
-  | { type: 'highlightGoRight' }
-  | { type: 'highlightReset' }
   | { type: 'loadExample' }
   | { type: 'pushResult'; result: number }
   | { type: 'querySet'; key: keyof StateBase['query']; value: number }
@@ -93,11 +96,20 @@ type BaseAction =
 export type Action = BaseAction | { type: 'undo' } | { type: 'redo' }
 
 function baseReducer(
-  state: StateBase,
+  state: StateBase & DerivedState,
   action: Action,
-): Omit<StateBase, 'action'> {
+): StateBase {
   if (action.type === 'setPoints') {
     return { ...state, points: action.points, results: [] }
+  }
+  if (action.type === 'deletePoint') {
+    return {
+      ...state,
+      points: state.points.filter((point) => point !== action.point),
+      results: [],
+      searchState: initialState.searchState,
+      highlight: initialState.highlight,
+    }
   }
   if (action.type === 'addPoint') {
     const maxId = state.points.reduce((a, b) => Math.max(a, b.id), 0)
@@ -105,42 +117,16 @@ function baseReducer(
       ...state,
       points: [...state.points, { ...action.point, id: maxId + 1 }],
       results: [],
+      searchState: initialState.searchState,
+      highlight: initialState.highlight,
     }
   }
   if (action.type === 'querySet') {
     return {
       ...state,
       query: { ...state.query, [action.key]: action.value },
-      highlight: initialState.highlight,
-    }
-  }
-  if (action.type === 'highlightGoLeft') {
-    const h = state.highlight
-    return {
-      ...state,
-      highlight: {
-        ...h,
-        path: [...h.path, 'left'],
-        layer: h.layer + 1,
-        id: h.id * 2,
-      },
-    }
-  }
-  if (action.type === 'highlightGoRight') {
-    const h = state.highlight
-    return {
-      ...state,
-      highlight: {
-        ...h,
-        path: [...h.path, 'right'],
-        layer: h.layer + 1,
-        id: h.id * 2 + 1,
-      },
-    }
-  }
-  if (action.type === 'highlightReset') {
-    return {
-      ...state,
+      results: [],
+      searchState: initialState.searchState,
       highlight: initialState.highlight,
     }
   }
@@ -159,6 +145,13 @@ function baseReducer(
         [0, 0],
       ].map(([x, y], i) => ({ x, y, id: i + 1 })),
       results: [],
+      query: {
+        ymin: 4,
+        ymax: 6,
+        xmin: 1,
+        xmax: 4,
+      },
+      searchState: initialState.searchState,
     }
   }
   if (action.type === 'findYMin') {
@@ -195,7 +188,6 @@ function historicReducer(cur: State, action: Action): State {
     ...next,
     historyPrev: prev,
     historyNext: null,
-    action,
     derived: derive(next, prev),
   }
 }

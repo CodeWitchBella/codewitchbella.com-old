@@ -75,34 +75,7 @@ function RangeTreeView() {
         </div>
       </div>
       <div>
-        Highlight:
-        <button
-          type="button"
-          onClick={() => {
-            dispatch({ type: 'highlightGoLeft' })
-          }}
-        >
-          Left
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            dispatch({ type: 'highlightGoRight' })
-          }}
-        >
-          Right
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            dispatch({ type: 'highlightReset' })
-          }}
-        >
-          Reset highlight
-        </button>
-      </div>
-      <div>
-        Next action: {nextState[state.searchState.status].description}{' '}
+        Next action:
         <button
           type="button"
           onClick={() => {
@@ -112,11 +85,11 @@ function RangeTreeView() {
         >
           Perform
         </button>
+        {nextState[state.searchState.status].description}{' '}
       </div>
-      <div>Last action: {JSON.stringify(state.action)}</div>
       <div css={{ display: 'flex', gap: '2rem' }}>
-        <BBSTView highlight={highlight} />
-        <Fractal highlight={highlight} />
+        <BBSTView />
+        <Fractal />
       </div>
       <div>
         <div>Results: {JSON.stringify(state.results)}</div>
@@ -159,8 +132,9 @@ const TreeLine = styled.div({
   gap: '.25rem',
 })
 
-function Fractal({ highlight }: { highlight: Highlight }) {
+function Fractal() {
   const state = useRangeTreeState()
+  const { highlight } = state
   const { fractal } = state.derived
   const highlightedNode = useMemo(() => {
     if (!state.highlight.ymin) return null
@@ -224,9 +198,11 @@ function Fractal({ highlight }: { highlight: Highlight }) {
   )
 }
 
-function BBSTView({ highlight }: { highlight: Highlight }) {
+function BBSTView() {
   const {
     derived: { bbst },
+    highlight,
+    searchState: { splitPoint },
   } = useRangeTreeState()
   return (
     <div css={{ display: 'flex' }}>
@@ -244,10 +220,17 @@ function BBSTView({ highlight }: { highlight: Highlight }) {
               <span
                 key={ni}
                 css={[
-                  highlight.layer === li && highlight.id === ni
-                    ? { background: 'yellow' }
-                    : {},
-                  { position: 'relative' },
+                  {
+                    background:
+                      highlight.layer === li && highlight.id === ni
+                        ? 'yellow'
+                        : undefined,
+                    textDecoration:
+                      splitPoint.layer === li && splitPoint.id === ni
+                        ? 'underline'
+                        : undefined,
+                    position: 'relative',
+                  },
                 ]}
               >
                 {node.value}
@@ -289,6 +272,7 @@ function PointChart({ points }: { points: Points }) {
   const wrap = useRef<HTMLDivElement>(null)
   const [labelValue, setLabelValue] = useState('')
   const bbRef = useRef<{ time: number; bb: DOMRect }>()
+  const dispatch = useRangeTreeDispatch()
 
   if (useSSR()) return null
   const xmax = points.reduce((b, { x: a }) => Math.max(a, b), 1)
@@ -353,8 +337,15 @@ function PointChart({ points }: { points: Points }) {
           }
         }}
       >
-        {points.map(({ x, y }, i) => (
-          <g key={i} css={{ ':hover': {} }} transform={`translate(${x}, ${y})`}>
+        {points.map((point, i) => (
+          <g
+            key={i}
+            css={{ cursor: 'pointer' }}
+            transform={`translate(${point.x}, ${point.y})`}
+            onClick={() => {
+              dispatch({ type: 'deletePoint', point })
+            }}
+          >
             <circle r={0.5} data-point-id={i} />
           </g>
         ))}
