@@ -158,7 +158,7 @@ function useCtxState() {
   return state
 }
 
-export default function RangeTree() {
+export function RangeTree() {
   const [state, dispatch] = useReducer(historicReducer, initialState)
   const { points, highlight } = state
   const bbst = useMemo(() => makeBBST(points), [points])
