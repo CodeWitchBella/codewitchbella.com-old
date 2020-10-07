@@ -1053,6 +1053,11 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@codewitchbella/react-resizer@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@codewitchbella/react-resizer/-/react-resizer-0.1.2.tgz#049244a1fc1ce0c41a719d8bac0ecaf05dca0666"
+  integrity sha512-n44OHCM5OiMzgbMwBYmZzCWjJwWGkwRuCnkdeWxPS2OvuHMWGTZ+5nHp8jlUINSsr/lP53EWEfGv/GprIay2Sg==
+
 "@emotion/babel-plugin@^11.0.0-next.17":
   version "11.0.0-next.17"
   resolved "https://registry.yarnpkg.com/@emotion/babel-plugin/-/babel-plugin-11.0.0-next.17.tgz#221020f82cb553416d352f6f5f565fe1e6fd5a9d"

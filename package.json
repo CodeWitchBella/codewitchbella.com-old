@@ -12,6 +12,7 @@
     "eslint": "eslint --ext .ts,.tsx --cache pages components src"
   },
   "dependencies": {
+    "@codewitchbella/react-resizer": "^0.1.2",
     "@emotion/cache": "^11.0.0-next.18",
     "@emotion/react": "^11.0.0-next.17",
     "@emotion/styled": "^11.0.0-next.17",
