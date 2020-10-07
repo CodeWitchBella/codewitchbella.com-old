@@ -126,10 +126,8 @@ function historicReducer(cur: State, action: Action): State {
 }
 
 export default function RangeTree() {
-  const [{ points, highlight }, dispatch] = useReducer(
-    historicReducer,
-    initialState,
-  )
+  const [state, dispatch] = useReducer(historicReducer, initialState)
+  const { points, highlight } = state
   const bbst = useMemo(() => makeBBST(points), [points])
   const fractal = useMemo(() => makeFractal(points), [points])
   return (
@@ -139,6 +137,20 @@ export default function RangeTree() {
         onClick={() => dispatch({ type: 'setPoints', points: [] })}
       >
         Remove all points
+      </button>
+      <button
+        type="button"
+        onClick={() => dispatch({ type: 'undo' })}
+        disabled={!state.historyPrev}
+      >
+        Undo
+      </button>
+      <button
+        type="button"
+        onClick={() => dispatch({ type: 'redo' })}
+        disabled={!state.historyNext}
+      >
+        Redo
       </button>
       <PointInput
         onPoint={(point) => {
