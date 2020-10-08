@@ -88,7 +88,7 @@ function RangeTreeView() {
               onClick={() => dispatch({ type: 'undo' })}
               disabled={!state.historyPrev}
             >
-              🠔
+              ←
             </button>
             <button
               type="button"
@@ -105,7 +105,7 @@ function RangeTreeView() {
               onClick={() => dispatch({ type: 'redo' })}
               disabled={!state.historyNext}
             >
-              🠒
+              →
             </button>
           </div>
 
