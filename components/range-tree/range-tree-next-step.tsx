@@ -38,7 +38,7 @@ export const nextState: {
     },
   },
   lookingForSplit: {
-    description: 'Looking for split point in x',
+    description: 'Search for split point in x',
     reduce(state): StateBase {
       const highlightLeft: Highlight = {
         id: state.highlight.id * 2,
@@ -83,7 +83,7 @@ export const nextState: {
     },
   },
   lookingForXmin: {
-    description: 'Looking for xmin',
+    description: 'Search for xmin',
     reduce(state): StateBase {
       const highlightLeft: Highlight = {
         id: state.highlight.id * 2,
@@ -160,7 +160,7 @@ export const nextState: {
     },
   },
   lookingForXmax: {
-    description: 'Looking for xmax',
+    description: 'Search for xmax',
     reduce(state) {
       const highlightLeft: Highlight = {
         id: state.highlight.id * 2,
