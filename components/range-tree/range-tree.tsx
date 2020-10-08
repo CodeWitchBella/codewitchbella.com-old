@@ -17,6 +17,7 @@ import {
   getFractalNodes,
 } from './derived'
 import { PointGrid } from './point-grid'
+import type { BBSTNode } from './bbst'
 
 export function RangeTree() {
   return (
@@ -24,6 +25,19 @@ export function RangeTree() {
       <RangeTreeView />
     </RangeTreeProvider>
   )
+}
+
+function getPoint(el: HTMLElement | null): { x: number; y: number } | null {
+  if (!el) return null
+  try {
+    const point = el.dataset['point']
+    if (point) {
+      const [x, y] = point.split(':').map((t) => Number.parseInt(t, 10))
+      return { x, y }
+    }
+    return getPoint(el.parentElement)
+  } catch {}
+  return null
 }
 
 function RangeTreeView() {
@@ -39,6 +53,11 @@ function RangeTreeView() {
         flexDirection: 'column',
         alignItems: 'center',
         paddingTop: '3rem',
+      }}
+      onMouseOver={(evt) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const point = getPoint(evt.target as any)
+        dispatch({ type: 'setHover', value: point })
       }}
     >
       <div css={{ textDecoration: 'underline' }}>isbl.cz/range-tree</div>
@@ -125,6 +144,9 @@ function RangeTreeView() {
               <div>
                 <span css={{ fontWeight: 'bold' }}>0</span> search position
               </div>
+              <div>
+                <span css={{ background: 'lime' }}>0</span> mouse hover
+              </div>
             </div>
           </div>
           <div
@@ -197,7 +219,7 @@ const TreeLine = styled.div({
 
 function Fractal() {
   const state = useRangeTreeState()
-  const { highlight } = state
+  const { highlight, hover } = state
   const { fractal } = state.derived
   const highlightedNode = useMemo(() => {
     if (!state.highlight.ymin) return null
@@ -211,11 +233,17 @@ function Fractal() {
             <div key={ni}>
               [
               {getFractalNodes(layerStart).map((node, i, list) => (
-                <>
+                <Fragment key={i}>
                   <span
+                    data-point={`${node.x}:${node.value}`}
                     css={[
-                      node === highlightedNode ? { background: 'yellow' } : {},
                       {
+                        background:
+                          hover && node.x === hover.x && node.value === hover.y
+                            ? 'lime'
+                            : node === highlightedNode
+                            ? 'yellow'
+                            : undefined,
                         position: 'relative',
                         cursor: 'pointer',
                         padding: 2,
@@ -250,7 +278,7 @@ function Fractal() {
                     ) : null}
                   </span>
                   {i !== list.length - 1 ? ',' : null}
-                </>
+                </Fragment>
               ))}
               ]
             </div>
@@ -264,8 +292,6 @@ function Fractal() {
 function BBSTView() {
   const {
     derived: { bbst },
-    highlight,
-    searchState: { splitPoint, reportBacktrack },
   } = useRangeTreeState()
   return (
     <div css={{ display: 'flex' }}>
@@ -279,57 +305,81 @@ function BBSTView() {
             }}
           >
             {layer.map((node, ni) => (
-              <Fragment key={ni}>
-                <span
-                  css={{
-                    width: '2.2ch',
-                    textAlign: 'center',
-                    background:
-                      highlight.layer === li && highlight.id === ni
-                        ? 'yellow'
-                        : undefined,
-                    textDecoration:
-                      splitPoint.layer === li && splitPoint.id === ni
-                        ? 'underline'
-                        : undefined,
-                    fontWeight:
-                      reportBacktrack.layer === li && reportBacktrack.id === ni
-                        ? 'bold'
-                        : reportBacktrack.layer < 0 &&
-                          highlight.layer === li &&
-                          highlight.id === ni
-                        ? 'bold'
-                        : undefined,
-                    position: 'relative',
-                  }}
-                >
-                  {node.value}
-                  <ArrowEnd
-                    id={`bbst:${li}:${ni}`}
-                    css={{ position: 'absolute', top: 0, left: '50%' }}
-                  />
-                  <ArrowStart
-                    id={`bbst:${li + 1}:${ni * 2}`}
-                    css={{ position: 'absolute', bottom: 0, left: '50%' }}
-                  />
-                  <ArrowStart
-                    id={`bbst:${li + 1}:${ni * 2 + 1}`}
-                    css={{ position: 'absolute', bottom: 0, left: '50%' }}
-                  />
-                </span>
-                {ni + 1 === layer.length
-                  ? Array.from({
-                      length: missingToPowerOfTwo(layer.length),
-                    }).map((_, fill) => (
-                      <span key={fill} css={{ width: '2.2ch' }} />
-                    ))
-                  : null}
-              </Fragment>
+              <BBSTNodeView node={node} key={ni} li={li} ni={ni} />
             ))}
           </div>
         ))}
       </TreeRoot>
     </div>
+  )
+}
+
+function BBSTNodeView({
+  node,
+  li,
+  ni,
+}: {
+  node: BBSTNode
+  li: number
+  ni: number
+}) {
+  const {
+    hover,
+    highlight,
+    searchState: { reportBacktrack, splitPoint },
+    derived: { bbst },
+  } = useRangeTreeState()
+  return (
+    <Fragment>
+      <span
+        data-point={`${node.value}:${node.y}`}
+        css={{
+          width: '2.2ch',
+          textAlign: 'center',
+          cursor: 'pointer',
+          background:
+            hover && hover.x === node.value && hover.y === node.y
+              ? 'lime'
+              : highlight.layer === li && highlight.id === ni
+              ? 'yellow'
+              : undefined,
+          textDecoration:
+            splitPoint.layer === li && splitPoint.id === ni
+              ? 'underline'
+              : undefined,
+          fontWeight:
+            reportBacktrack.layer === li && reportBacktrack.id === ni
+              ? 'bold'
+              : reportBacktrack.layer < 0 &&
+                highlight.layer === li &&
+                highlight.id === ni
+              ? 'bold'
+              : undefined,
+          position: 'relative',
+        }}
+      >
+        {node.value}
+        <ArrowEnd
+          id={`bbst:${li}:${ni}`}
+          css={{ position: 'absolute', top: 0, left: '50%' }}
+        />
+        <ArrowStart
+          id={`bbst:${li + 1}:${ni * 2}`}
+          css={{ position: 'absolute', bottom: 0, left: '50%' }}
+        />
+        <ArrowStart
+          id={`bbst:${li + 1}:${ni * 2 + 1}`}
+          css={{ position: 'absolute', bottom: 0, left: '50%' }}
+        />
+      </span>
+      {ni + 1 === bbst.layers[li].length
+        ? Array.from({
+            length: missingToPowerOfTwo(bbst.layers[li].length),
+          }).map((_, fill) => (
+            <span key={'fill:' + fill} css={{ width: '2.2ch' }} />
+          ))
+        : null}
+    </Fragment>
   )
 }
 

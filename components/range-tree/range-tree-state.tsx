@@ -23,6 +23,7 @@ export type StateBase = {
   highlight: Highlight
   query: { xmin: number; xmax: number; ymin: number; ymax: number }
   results: readonly { x: number; y: number }[]
+  hover: { x: number; y: number } | null
 
   searchState: {
     status: keyof typeof nextState
@@ -70,6 +71,7 @@ export const initialState: State = {
   points: [],
   highlight: initialHighlight,
   query: { xmin: 0, xmax: 0, ymin: 0, ymax: 0 },
+  hover: null,
   results: [],
   historyPrev: null,
   historyNext: null,
@@ -95,6 +97,7 @@ type BaseAction =
   | { type: 'querySet'; key: keyof StateBase['query']; value: number }
   | { type: 'findYMin' }
   | { type: 'step' }
+  | { type: 'setHover'; value: { x: number; y: number } | null }
 export type Action = BaseAction | { type: 'undo' } | { type: 'redo' }
 
 function baseReducer(
@@ -151,7 +154,7 @@ function baseReducer(
         ymin: 4,
         ymax: 6,
         xmin: 1,
-        xmax: 4,
+        xmax: 3,
       },
       searchState: initialState.searchState,
     }
@@ -167,6 +170,12 @@ function baseReducer(
   }
   if (action.type === 'step') {
     return nextState[state.searchState.status].reduce(state)
+  }
+  if (action.type === 'setHover') {
+    return {
+      ...state,
+      hover: action.value,
+    }
   }
   throw new Error('Unknown action')
 }

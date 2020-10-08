@@ -5,7 +5,7 @@ import { useRangeTreeDispatch, useRangeTreeState } from './range-tree-state'
 import Resizer from '@codewitchbella/react-resizer'
 
 export function PointGrid({ xmax, ymax }: { xmax: number; ymax: number }) {
-  const { query, points } = useRangeTreeState()
+  const { query, points, hover } = useRangeTreeState()
   const label = useRef<HTMLDivElement>(null)
   const wrap = useRef<HTMLDivElement>(null)
   const [labelValue, setLabelValue] = useState('')
@@ -135,9 +135,14 @@ export function PointGrid({ xmax, ymax }: { xmax: number; ymax: number }) {
                     <circle
                       r={0.3}
                       data-point-id={pointId}
+                      data-point={`${x}:${y}`}
                       css={{
                         fill:
-                          typeof pointId === 'number' ? 'black' : 'transparent',
+                          hover && hover.x === x && hover.y === y
+                            ? 'lime'
+                            : typeof pointId === 'number'
+                            ? 'black'
+                            : 'transparent',
                       }}
                     />
                   </g>
@@ -145,18 +150,6 @@ export function PointGrid({ xmax, ymax }: { xmax: number; ymax: number }) {
               )
             })}
           </Fragment>
-        ))}
-        {points.map((point, i) => (
-          <g
-            key={i}
-            css={{ cursor: 'pointer' }}
-            transform={`translate(${point.x}, ${point.y})`}
-            onClick={() => {
-              dispatch({ type: 'deletePoint', point })
-            }}
-          >
-            <circle r={0.3} data-point-id={i} />
-          </g>
         ))}
       </svg>
       <div

@@ -2,13 +2,14 @@ import type { Points } from './range-tree-state'
 
 export type BBSTNode = {
   value: number
+  y: number
   left: BBSTNode | null
   right: BBSTNode | null
 }
 
 export function makeBBST(points: Points) {
   let layer = points
-    .map(({ x }): BBSTNode => ({ value: x, left: null, right: null }))
+    .map(({ x, y }): BBSTNode => ({ value: x, left: null, right: null, y }))
     .sort(({ value: a }, { value: b }) => a - b)
   const layers: BBSTNode[][] = [layer]
   while (layer.length > 1) {
@@ -16,7 +17,13 @@ export function makeBBST(points: Points) {
     for (let i = 0; i < layer.length; i += 2) {
       const left = layer[i]
       const right = i + 1 >= layer.length ? null : layer[i + 1]
-      newLayer.push({ value: findMax(left) ?? left.value, left, right })
+      const max = findMax(left)
+      newLayer.push({
+        value: max?.value ?? left.value,
+        left,
+        right,
+        y: max?.y ?? left.y,
+      })
     }
     layers.unshift(newLayer)
     layer = newLayer
@@ -24,11 +31,18 @@ export function makeBBST(points: Points) {
   return { root: layer[0], layers }
 }
 
-function findMax(node: BBSTNode | null): number | null {
+function findMax(node: BBSTNode | null): BBSTNode | null {
   if (!node) return null
-  return Math.max(
-    node.value,
-    findMax(node.left) ?? Number.NEGATIVE_INFINITY,
-    findMax(node.right) ?? Number.NEGATIVE_INFINITY,
-  )
+
+  const left = findMax(node.left)
+  const right = findMax(node.right)
+  return max(left, max(right, node))
+}
+
+function max(a: BBSTNode | null, b: BBSTNode | null) {
+  if (!a && !b) return null
+  if (!a) return b
+  if (!b) return a
+  if (a.value > b.value) return a
+  return b
 }
