@@ -91,14 +91,27 @@ export const nextState: {
       const node = getBBSTHighlighted(state)
       if (!nodeLeft && !nodeRight) {
         // leaf
-        return {
-          ...state,
-          searchState: {
-            ...state.searchState,
-            status: 'reportSubtree',
-            reportBacktrackForm: 'xmax',
-            reportBacktrack: state.searchState.splitPoint,
-          },
+        if (state.query.xmin <= node.value) {
+          return {
+            ...state,
+            searchState: {
+              ...state.searchState,
+              status: 'reportSubtree',
+              reportBacktrackForm: 'xmax',
+              reportBacktrack: state.searchState.splitPoint,
+            },
+          }
+        } else {
+          return {
+            ...state,
+            searchState: {
+              ...state.searchState,
+              status: 'lookingForXmax',
+              reportedSub: true,
+              reportBacktrack: initialState.highlight,
+              reportBacktrackForm: 'xmax',
+            },
+          }
         }
       }
       if (!nodeRight) {
@@ -156,14 +169,27 @@ export const nextState: {
 
       if (!nodeLeft && !nodeRight) {
         // leaf
-        return {
-          ...state,
-          searchState: {
-            ...state.searchState,
-            status: 'reportSubtree',
-            reportBacktrackForm: 'done',
-            reportBacktrack: initialState.highlight,
-          },
+        if (node.value <= state.query.xmax) {
+          return {
+            ...state,
+            searchState: {
+              ...state.searchState,
+              status: 'reportSubtree',
+              reportBacktrackForm: 'done',
+              reportBacktrack: initialState.highlight,
+            },
+          }
+        } else {
+          return {
+            ...state,
+            highlight: initialState.highlight,
+            searchState: {
+              ...state.searchState,
+              reportBacktrack: initialState.highlight,
+              reportedSub: true,
+              status: 'done',
+            },
+          }
         }
       }
       if (!nodeRight) {
