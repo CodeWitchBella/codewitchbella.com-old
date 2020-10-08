@@ -67,11 +67,11 @@ function RangeTreeView() {
       </button>
       <div>
         Query:
-        <div>
+        <div css={{ display: 'flex', gap: '1ch' }}>
           <QueryField field="ymin" />
           <QueryField field="ymax" />
         </div>
-        <div>
+        <div css={{ display: 'flex', gap: '1ch' }}>
           <QueryField field="xmin" />
           <QueryField field="xmax" />
         </div>
@@ -133,7 +133,7 @@ function QueryField({ field }: { field: keyof RangeTreeState['query'] }) {
       {': '}
       <input
         type="number"
-        value={value}
+        value={value + ''}
         onChange={(evt) => {
           const next = Number.parseInt(evt.target?.value, 10)
           if (Number.isInteger(next))
@@ -306,8 +306,8 @@ function PointChart({ points }: { points: Points }) {
   const dispatch = useRangeTreeDispatch()
 
   if (useSSR()) return null
-  const xmax = points.reduce((b, { x: a }) => Math.max(a, b), 1)
-  const ymax = points.reduce((b, { y: a }) => Math.max(a, b), 1)
+  const xmax = points.reduce((b, { x: a }) => Math.max(a, b), query.xmax)
+  const ymax = points.reduce((b, { y: a }) => Math.max(a, b), query.ymax)
 
   return (
     <Resizer
@@ -339,8 +339,8 @@ function PointChart({ points }: { points: Points }) {
               bb: evt.currentTarget.getBoundingClientRect(),
             }
           const { bb } = bbRef.current
-          const x = evt.clientX - bb.left + window.scrollX
-          const y = evt.clientY - bb.top + window.scrollY
+          const x = evt.clientX - bb.left
+          const y = evt.clientY - bb.top
           const l = label.current
           if (!l) return
           l.style.left = x + 10 + 'px'
@@ -368,8 +368,9 @@ function PointChart({ points }: { points: Points }) {
           }
         }}
       >
-        {Array.from({ length: xmax + 1 }).map((_, i) => (
+        {Array.from({ length: ymax + 1 }).map((_, i) => (
           <line
+            key={i}
             x1={0}
             x2={xmax}
             y1={i}
@@ -378,8 +379,9 @@ function PointChart({ points }: { points: Points }) {
             strokeLinecap="round"
           />
         ))}
-        {Array.from({ length: ymax + 1 }).map((_, i) => (
+        {Array.from({ length: xmax + 1 }).map((_, i) => (
           <line
+            key={i}
             x1={i}
             x2={i}
             y1={0}
@@ -426,7 +428,7 @@ function PointChart({ points }: { points: Points }) {
       </div>
       <div
         style={{
-          paddingBottom: (ymax / xmax) * 100 + '%',
+          paddingBottom: ((ymax + 2) / (xmax + 2)) * 100 + '%',
           pointerEvents: 'none',
         }}
       />
@@ -453,16 +455,33 @@ function PointInput({
         if (typeof sx !== 'string' || typeof sy !== 'string') return
         const x = Number.parseInt(sx, 10)
         const y = Number.parseInt(sy, 10)
-        console.log({ x, y })
         if (!Number.isInteger(x) || !Number.isInteger(y)) return
         onPoint({ x, y })
       }}
     >
       <label>
-        X: <input type="number" required min={0} max={100} step={1} name="x" />
+        X:{' '}
+        <input
+          type="number"
+          required
+          min={0}
+          max={100}
+          step={1}
+          name="x"
+          css={{ maxWidth: '5ch', marginRight: '1ch' }}
+        />
       </label>
       <label>
-        Y: <input type="number" required min={0} max={100} step={1} name="y" />
+        Y:{' '}
+        <input
+          type="number"
+          required
+          min={0}
+          max={100}
+          step={1}
+          name="y"
+          css={{ maxWidth: '5ch' }}
+        />
       </label>
       <button>Add point</button>
     </form>
