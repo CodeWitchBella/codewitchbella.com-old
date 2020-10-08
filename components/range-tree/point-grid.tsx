@@ -66,19 +66,19 @@ export function PointGrid({ xmax, ymax }: { xmax: number; ymax: number }) {
         onPointerOver={(evt) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const target: any = evt.target
-          const pointIdString = target?.dataset?.pointId
-          if (typeof pointIdString !== 'string') {
+          const pointString: string = target?.dataset?.point
+          if (!pointString) {
             clear()
             return
           }
-          const pointId = Number.parseInt(pointIdString, 10)
-          const point = points[pointId]
-          if (!point) {
+          const [x, y] = pointString
+            .split(':')
+            .map((i) => Number.parseInt(i, 10))
+          if (!Number.isInteger(x) || !Number.isInteger(y)) {
             clear()
             return
           }
-
-          setLabelValue(`[${point.x},${point.y}]`)
+          setLabelValue(`[${x},${y}]`)
 
           function clear() {
             setLabelValue('')
@@ -122,7 +122,7 @@ export function PointGrid({ xmax, ymax }: { xmax: number; ymax: number }) {
                 <Fragment key={y}>
                   <g
                     css={{ cursor: 'pointer' }}
-                    transform={`translate(${x}, ${y})`}
+                    transform={`translate(${x}, ${ymax - y})`}
                     onClick={() => {
                       if (typeof pointId === 'number')
                         dispatch({
