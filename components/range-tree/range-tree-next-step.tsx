@@ -54,6 +54,16 @@ export const nextState: {
         path: [...state.highlight.path, 'right'],
       }
       const node = getBBSTHighlighted(state)
+      if (!node) {
+        return {
+          ...state,
+          highlight: initialState.highlight,
+          searchState: {
+            ...state.searchState,
+            status: 'done',
+          },
+        }
+      }
       if (node.value >= state.query.xmin && node.value >= state.query.xmax) {
         return { ...state, highlight: highlightLeft }
       }
