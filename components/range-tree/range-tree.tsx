@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react'
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import {
   Points,
   RangeTreeProvider,
@@ -186,7 +186,7 @@ const TreeRoot = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
-  gap: '.5rem',
+  gap: '1rem',
 })
 
 const TreeLine = styled.div({
@@ -276,14 +276,14 @@ function BBSTView() {
             css={{
               display: 'flex',
               justifyContent: 'space-evenly',
-              gap: '.5rem',
             }}
           >
             {layer.map((node, ni) => (
-              <span
-                key={ni}
-                css={[
-                  {
+              <Fragment key={ni}>
+                <span
+                  css={{
+                    width: '2.2ch',
+                    textAlign: 'center',
                     background:
                       highlight.layer === li && highlight.id === ni
                         ? 'yellow'
@@ -301,29 +301,46 @@ function BBSTView() {
                         ? 'bold'
                         : undefined,
                     position: 'relative',
-                  },
-                ]}
-              >
-                {node.value}
-                <ArrowEnd
-                  id={`bbst:${li}:${ni}`}
-                  css={{ position: 'absolute', top: 0, left: '50%' }}
-                />
-                <ArrowStart
-                  id={`bbst:${li + 1}:${ni * 2}`}
-                  css={{ position: 'absolute', bottom: 0, left: '50%' }}
-                />
-                <ArrowStart
-                  id={`bbst:${li + 1}:${ni * 2 + 1}`}
-                  css={{ position: 'absolute', bottom: 0, left: '50%' }}
-                />
-              </span>
+                  }}
+                >
+                  {node.value}
+                  <ArrowEnd
+                    id={`bbst:${li}:${ni}`}
+                    css={{ position: 'absolute', top: 0, left: '50%' }}
+                  />
+                  <ArrowStart
+                    id={`bbst:${li + 1}:${ni * 2}`}
+                    css={{ position: 'absolute', bottom: 0, left: '50%' }}
+                  />
+                  <ArrowStart
+                    id={`bbst:${li + 1}:${ni * 2 + 1}`}
+                    css={{ position: 'absolute', bottom: 0, left: '50%' }}
+                  />
+                </span>
+                {ni + 1 === layer.length
+                  ? Array.from({
+                      length: missingToPowerOfTwo(layer.length),
+                    }).map((_, fill) => (
+                      <span key={fill} css={{ width: '2.2ch' }} />
+                    ))
+                  : null}
+              </Fragment>
             ))}
           </div>
         ))}
       </TreeRoot>
     </div>
   )
+}
+
+function missingToPowerOfTwo(l: number) {
+  let power = 1
+  while (true) {
+    if (power >= l) {
+      return power - l
+    }
+    power = power * 2
+  }
 }
 
 let isSSR = true
