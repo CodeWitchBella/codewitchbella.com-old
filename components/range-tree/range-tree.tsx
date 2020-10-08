@@ -67,14 +67,16 @@ function RangeTreeView() {
 
       <PointChart points={points} />
       <div css={{ paddingBlock: '1rem' }}>
-        Query:
+        <div>Query:</div>
         <div css={{ display: 'flex', gap: '1ch' }}>
-          <QueryField field="ymin" />
-          <QueryField field="ymax" />
-        </div>
-        <div css={{ display: 'flex', gap: '1ch' }}>
-          <QueryField field="xmin" />
-          <QueryField field="xmax" />
+          <div css={{ display: 'flex', flexDirection: 'column' }}>
+            <QueryField field="xmin" />
+            <QueryField field="xmax" />
+          </div>
+          <div css={{ display: 'flex', flexDirection: 'column' }}>
+            <QueryField field="ymin" />
+            <QueryField field="ymax" />
+          </div>
         </div>
       </div>
       {state.points.length > 0 ? (
