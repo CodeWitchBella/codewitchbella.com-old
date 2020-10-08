@@ -78,7 +78,7 @@ export function PointGrid({ xmax, ymax }: { xmax: number; ymax: number }) {
             clear()
             return
           }
-          setLabelValue(`[${x},${y}]`)
+          setLabelValue(`(${x},${y})`)
 
           function clear() {
             setLabelValue('')
