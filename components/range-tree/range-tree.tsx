@@ -31,7 +31,8 @@ function RangeTreeView() {
   const dispatch = useRangeTreeDispatch()
   const { points } = state
   return (
-    <div>
+    <div css={{ fontFamily: 'sans-serif' }}>
+      <div css={{ textDecoration: 'underline' }}>isbl.cz/range-tree</div>
       <button
         type="button"
         onClick={() => dispatch({ type: 'setPoints', points: [] })}
