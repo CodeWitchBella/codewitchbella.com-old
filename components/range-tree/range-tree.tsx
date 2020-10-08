@@ -31,42 +31,42 @@ function RangeTreeView() {
   const dispatch = useRangeTreeDispatch()
   const { points } = state
   return (
-    <div css={{ fontFamily: 'sans-serif' }}>
+    <div
+      css={{
+        fontFamily: 'sans-serif',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        paddingTop: '3rem',
+      }}
+    >
       <div css={{ textDecoration: 'underline' }}>isbl.cz/range-tree</div>
-      <button
-        type="button"
-        onClick={() => dispatch({ type: 'setPoints', points: [] })}
-      >
-        Remove all points
-      </button>
-      <button
-        type="button"
-        onClick={() => dispatch({ type: 'undo' })}
-        disabled={!state.historyPrev}
-      >
-        Undo
-      </button>
-      <button
-        type="button"
-        onClick={() => dispatch({ type: 'redo' })}
-        disabled={!state.historyNext}
-      >
-        Redo
-      </button>
-      <PointInput
-        onPoint={(point) => {
-          dispatch({ type: 'addPoint', point })
-        }}
-      />
-      <button
-        type="button"
-        onClick={() => {
-          dispatch({ type: 'loadExample' })
-        }}
-      >
-        Load example
-      </button>
-      <div>
+
+      <div css={{ paddingBlock: '1rem' }}>
+        <PointInput
+          onPoint={(point) => {
+            dispatch({ type: 'addPoint', point })
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => {
+            dispatch({ type: 'loadExample' })
+          }}
+        >
+          Load example
+        </button>
+        <button
+          type="button"
+          onClick={() => dispatch({ type: 'setPoints', points: [] })}
+        >
+          Remove all points
+        </button>
+      </div>
+
+      <PointChart points={points} />
+      <div css={{ paddingBlock: '1rem' }}>
         Query:
         <div css={{ display: 'flex', gap: '1ch' }}>
           <QueryField field="ymin" />
@@ -77,24 +77,22 @@ function RangeTreeView() {
           <QueryField field="xmax" />
         </div>
       </div>
-      <PointChart points={points} />
-
       {state.points.length > 0 ? (
         <>
           <div>
-            Next action:
-            <button
-              type="button"
-              onClick={() => {
-                dispatch({ type: 'step' })
-              }}
-              disabled={state.searchState.status === 'done'}
-            >
-              Perform
-            </button>
+            Next step:
             {nextState[state.searchState.status].description}{' '}
           </div>
-          <div css={{ display: 'flex', gap: '2rem' }}>
+          <button
+            type="button"
+            onClick={() => {
+              dispatch({ type: 'step' })
+            }}
+            disabled={state.searchState.status === 'done'}
+          >
+            Perform
+          </button>
+          <div css={{ display: 'flex', gap: '2rem', paddingTop: '1rem' }}>
             <BBSTView />
             <Fractal />
             <div>
@@ -111,16 +109,59 @@ function RangeTreeView() {
               </div>
             </div>
           </div>
-          <div css={{ minHeight: '100vh' }}>
-            Results:{' '}
-            {state.results.map(({ x, y }, i) => (
-              <div key={i}>
-                {x}:{y}
-              </div>
-            ))}
+          <div
+            css={{
+              marginTop: '1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <div>Results:</div>
+            <div
+              css={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                alignItems: 'flex-start',
+                flexWrap: 'wrap',
+                gap: '.5rem',
+              }}
+            >
+              {state.results.map(({ x, y }, i) => (
+                <div key={i} css={{ border: '1px solid gray' }}>
+                  {x}:{y}
+                </div>
+              ))}
+            </div>
+            <div css={{ minHeight: '100vh' }} />
           </div>
         </>
       ) : null}
+      <div
+        css={{
+          position: 'fixed',
+          bottom: 0,
+          paddingInline: '1rem',
+          paddingBlockStart: '.5rem',
+          background: 'white',
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => dispatch({ type: 'undo' })}
+          disabled={!state.historyPrev}
+        >
+          Undo
+        </button>
+        <button
+          type="button"
+          onClick={() => dispatch({ type: 'redo' })}
+          disabled={!state.historyNext}
+        >
+          Redo
+        </button>
+      </div>
     </div>
   )
 }
