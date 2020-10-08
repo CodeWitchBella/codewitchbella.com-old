@@ -117,13 +117,13 @@ function RangeTreeView() {
             <div>
               <div>Legend</div>
               <div>
-                <span css={{ background: 'yellow' }}>x</span> active node
+                <span css={{ background: 'yellow' }}>0</span> active node
               </div>
               <div>
-                <span css={{ textDecoration: 'underline' }}>x</span> split point
+                <span css={{ textDecoration: 'underline' }}>0</span> split point
               </div>
               <div>
-                <span css={{ fontWeight: 'bold' }}>x</span> search position
+                <span css={{ fontWeight: 'bold' }}>0</span> search position
               </div>
             </div>
           </div>
