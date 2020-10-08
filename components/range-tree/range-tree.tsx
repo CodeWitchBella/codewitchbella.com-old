@@ -80,32 +80,48 @@ function RangeTreeView() {
       {state.points.length > 0 ? (
         <>
           <div>
-            Next step:
-            {nextState[state.searchState.status].description}{' '}
+            Next step: {nextState[state.searchState.status].description}{' '}
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              dispatch({ type: 'step' })
-            }}
-            disabled={state.searchState.status === 'done'}
-          >
-            Perform
-          </button>
+          <div css={{ display: 'flex', alignItems: 'stretch' }}>
+            <button
+              type="button"
+              onClick={() => dispatch({ type: 'undo' })}
+              disabled={!state.historyPrev}
+            >
+              🠔
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                dispatch({ type: 'step' })
+              }}
+              disabled={state.searchState.status === 'done'}
+            >
+              Perform
+            </button>
+
+            <button
+              type="button"
+              onClick={() => dispatch({ type: 'redo' })}
+              disabled={!state.historyNext}
+            >
+              🠒
+            </button>
+          </div>
+
           <div css={{ display: 'flex', gap: '2rem', paddingTop: '1rem' }}>
             <BBSTView />
             <Fractal />
             <div>
               <div>Legend</div>
               <div>
-                Active node <span css={{ background: 'yellow' }}>x</span>
+                <span css={{ background: 'yellow' }}>x</span> active node
               </div>
               <div>
-                Split point <span css={{ textDecoration: 'underline' }}>x</span>
+                <span css={{ textDecoration: 'underline' }}>x</span> split point
               </div>
               <div>
-                xmin/xmax search position{' '}
-                <span css={{ fontWeight: 'bold' }}>x</span>
+                <span css={{ fontWeight: 'bold' }}>x</span> search position
               </div>
             </div>
           </div>
@@ -128,6 +144,7 @@ function RangeTreeView() {
                 gap: '.5rem',
               }}
             >
+              {state.results.length < 1 ? 'Empty' : ''}
               {state.results.map(({ x, y }, i) => (
                 <div key={i} css={{ border: '1px solid gray' }}>
                   {x}:{y}
@@ -138,30 +155,6 @@ function RangeTreeView() {
           </div>
         </>
       ) : null}
-      <div
-        css={{
-          position: 'fixed',
-          bottom: 0,
-          paddingInline: '1rem',
-          paddingBlockStart: '.5rem',
-          background: 'white',
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => dispatch({ type: 'undo' })}
-          disabled={!state.historyPrev}
-        >
-          Undo
-        </button>
-        <button
-          type="button"
-          onClick={() => dispatch({ type: 'redo' })}
-          disabled={!state.historyNext}
-        >
-          Redo
-        </button>
-      </div>
     </div>
   )
 }
@@ -299,6 +292,10 @@ function BBSTView() {
                         : undefined,
                     fontWeight:
                       reportBacktrack.layer === li && reportBacktrack.id === ni
+                        ? 'bold'
+                        : reportBacktrack.layer < 0 &&
+                          highlight.layer === li &&
+                          highlight.id === ni
                         ? 'bold'
                         : undefined,
                     position: 'relative',
