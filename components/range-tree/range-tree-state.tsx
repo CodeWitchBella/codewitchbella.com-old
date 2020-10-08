@@ -9,7 +9,7 @@ import { makeBBST } from './bbst'
 import { makeFractal } from './derived'
 import { nextState } from './range-tree-next-step'
 
-type Point = { x: number; y: number; id: number }
+export type Point = { x: number; y: number; id: number }
 export type Points = readonly Point[]
 export type Highlight = {
   layer: number

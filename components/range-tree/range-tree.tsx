@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import Resizer from '@codewitchbella/react-resizer'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Points,
   RangeTreeProvider,
@@ -17,6 +16,7 @@ import {
   findHighlightedNodeFractal,
   getFractalNodes,
 } from './derived'
+import { PointGrid } from './point-grid'
 
 export function RangeTree() {
   return (
@@ -338,141 +338,18 @@ function useSSR() {
 
 function PointChart({ points }: { points: Points }) {
   const { query } = useRangeTreeState()
-  const label = useRef<HTMLDivElement>(null)
-  const wrap = useRef<HTMLDivElement>(null)
-  const [labelValue, setLabelValue] = useState('')
-  const bbRef = useRef<{ time: number; bb: DOMRect }>()
-  const dispatch = useRangeTreeDispatch()
 
   if (useSSR()) return null
-  const xmax = points.reduce((b, { x: a }) => Math.max(a, b), query.xmax)
-  const ymax = points.reduce((b, { y: a }) => Math.max(a, b), query.ymax)
-
-  return (
-    <Resizer
-      direction="horizontal"
-      style={{
-        width: 200,
-        position: 'relative',
-      }}
-      ref={wrap}
-      css={{
-        '&:hover .label': {
-          display: 'block',
-        },
-      }}
-    >
-      <svg
-        style={{
-          left: 0,
-          right: 0,
-          position: 'absolute',
-          background: 'lightgray',
-        }}
-        viewBox={`-1 -1 ${xmax + 2} ${ymax + 2}`}
-        onPointerMove={(evt) => {
-          const now = Date.now()
-          if (!bbRef.current || now - bbRef.current.time > 100)
-            bbRef.current = {
-              time: now,
-              bb: evt.currentTarget.getBoundingClientRect(),
-            }
-          const { bb } = bbRef.current
-          const x = evt.clientX - bb.left
-          const y = evt.clientY - bb.top
-          const l = label.current
-          if (!l) return
-          l.style.left = x + 10 + 'px'
-          l.style.top = y + 10 + 'px'
-        }}
-        onPointerOver={(evt) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const target: any = evt.target
-          const pointIdString = target?.dataset?.pointId
-          if (typeof pointIdString !== 'string') {
-            clear()
-            return
-          }
-          const pointId = Number.parseInt(pointIdString, 10)
-          const point = points[pointId]
-          if (!point) {
-            clear()
-            return
-          }
-
-          setLabelValue(`${point.x}:${point.y}`)
-
-          function clear() {
-            setLabelValue('')
-          }
-        }}
-      >
-        {Array.from({ length: ymax + 1 }).map((_, i) => (
-          <line
-            key={i}
-            x1={0}
-            x2={xmax}
-            y1={i}
-            y2={i}
-            style={{ stroke: 'blue', strokeWidth: 0.1 }}
-            strokeLinecap="round"
-          />
-        ))}
-        {Array.from({ length: xmax + 1 }).map((_, i) => (
-          <line
-            key={i}
-            x1={i}
-            x2={i}
-            y1={0}
-            y2={ymax}
-            style={{ stroke: 'blue', strokeWidth: 0.1 }}
-            strokeLinecap="round"
-          />
-        ))}
-        <rect
-          x={query.xmin - 0.5}
-          y={query.ymin - 0.5}
-          width={query.xmax - query.xmin + 1}
-          height={query.ymax - query.ymin + 1}
-          fill="green"
-        />
-        {points.map((point, i) => (
-          <g
-            key={i}
-            css={{ cursor: 'pointer' }}
-            transform={`translate(${point.x}, ${point.y})`}
-            onClick={() => {
-              dispatch({ type: 'deletePoint', point })
-            }}
-          >
-            <circle r={0.3} data-point-id={i} />
-          </g>
-        ))}
-      </svg>
-      <div
-        ref={label}
-        className="label"
-        css={{
-          position: 'absolute',
-          display: 'none',
-          pointerEvents: 'none',
-          background: 'white',
-          paddingInline: '.5rem',
-          paddingBlock: '.25rem',
-          opacity: labelValue ? 1 : 0,
-          border: '1px solid black',
-        }}
-      >
-        {labelValue}
-      </div>
-      <div
-        style={{
-          paddingBottom: ((ymax + 2) / (xmax + 2)) * 100 + '%',
-          pointerEvents: 'none',
-        }}
-      />
-    </Resizer>
+  const xmax = points.reduce(
+    (b, { x: a }) => Math.max(a, b),
+    Math.max(query.xmax, 8),
   )
+  const ymax = points.reduce(
+    (b, { y: a }) => Math.max(a, b),
+    Math.max(query.ymax, 8),
+  )
+
+  return <PointGrid xmax={xmax} ymax={ymax} />
 }
 
 function PointInput({
