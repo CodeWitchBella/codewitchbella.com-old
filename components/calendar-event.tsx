@@ -28,7 +28,12 @@ export function CalEvent({
           {ctx.czech ? subject?.name : subject?.enname ?? subject?.name ?? ''}
         </div>
       ) : null}
-      {ctx.deets ? children : null}
+      {ctx.deets ? (
+        <>
+          {subject?.deets}
+          <div>{children}</div>
+        </>
+      ) : null}
     </Event>
   )
 }
@@ -41,7 +46,9 @@ const Event = styled.div({
 
 const eventContext = createContext({
   subjects: {} as {
-    [key: string]: { name: string; enname?: string } | undefined
+    [key: string]:
+      | { name: string; enname?: string; deets: JSX.Element }
+      | undefined
   },
   showTitles: false,
   czech: true,

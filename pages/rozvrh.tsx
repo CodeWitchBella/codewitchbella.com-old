@@ -8,7 +8,7 @@ import { CalEvent, Cz, En, EventProvider } from '../components/calendar-event'
 export default function FEL() {
   const [showTitles, setShowTitles] = useBooleanQueryParam('titles', false)
   const [english, toggleLang] = useEn()
-  const [deets, setDeets] = useBooleanQueryParam('deets', false)
+  const [deets, setDeets] = useBooleanQueryParam('deets', true)
   const [links, setLinks] = useLocalStorage('rozvrh:links')
 
   useSetOnWindow('setLink', (type: string, value: string) => {
@@ -25,23 +25,87 @@ export default function FEL() {
           DPG: {
             name: 'Datové struktury počítačové grafiky',
             enname: 'Data Structures for Computer Graphics',
+            deets: (
+              <>
+                Havran
+                <br />
+                Teams
+                <br />
+                <Link to="https://cw.fel.cvut.cz/wiki/courses/b4m39dpg/start">
+                  CourseWare
+                </Link>
+              </>
+            ),
           },
           APG: {
             name: 'Algoritmy počítačové grafiky',
             enname: 'Algorithms of Computer Graphics',
+            deets: (
+              <>
+                Teams
+                <br />
+                <Link to="https://cw.fel.cvut.cz/wiki/courses/b4m39apg/start">
+                  CourseWare
+                </Link>
+                <br />
+                <Link to="https://cw.felk.cvut.cz/brute/student/course/B4M39APG">
+                  Brute
+                </Link>
+              </>
+            ),
           },
           GPU: {
             name: 'Obecné výpočty na grafických procesorech',
             enname: 'General-Purpose Computing on GPU',
+            deets: (
+              <>
+                <MaybeLink to={links?.GPU}>Zoom</MaybeLink>
+                <br />
+                <Link to="https://cent.felk.cvut.cz/courses/GPU/index.html">
+                  <En>Website</En>
+                  <Cz>Stránky</Cz>
+                </Link>
+              </>
+            ),
           },
-          VG: { name: 'Výpočetní geometrie', enname: 'Computational Geometry' },
+          VG: {
+            name: 'Výpočetní geometrie',
+            enname: 'Computational Geometry',
+            deets: (
+              <>
+                <MaybeLink to={links?.CG}>Zoom</MaybeLink>
+                <br />
+                <Link to="https://cw.fel.cvut.cz/wiki/courses/cg/start">
+                  CourseWare
+                </Link>
+                <br />
+                <Link to="https://cw.felk.cvut.cz/brute/student/course/CG">
+                  Brute
+                </Link>
+              </>
+            ),
+          },
           MMA: {
             name: 'Multimédia a počítačová animace',
             enname: 'Multimedia and Computer Animation',
+            deets: <>Teams</>,
           },
           ITT: {
             name: 'Intermediální tvorba a technologie I',
             enname: 'Applied Multimedia and Technology I',
+            deets: (
+              <>
+                <div>
+                  Teams
+                  <br />
+                  <Link to="https://cw.fel.cvut.cz/wiki/courses/b0m39itt1/start">
+                    CourseWare
+                  </Link>
+                </div>
+                <Link to="https://www.purrdata.net/">purrdata</Link> <Cz>a</Cz>
+                <En>and</En> <Link to="https://vvvv.org">vvvv</Link>
+              </>
+            ),
           },
         },
       }}
@@ -77,92 +141,38 @@ export default function FEL() {
           <DayTitle>
             <Cz>Pondělí/</Cz>Monday
           </DayTitle>
-          <CalEvent type="lecture" title="DPG" time="11:00 - 12:30">
-            Havran
-            <br />
-            Teams
-            <br />
-            <Link to="https://cw.fel.cvut.cz/wiki/courses/b4m39dpg/start">
-              CourseWare
-            </Link>
-          </CalEvent>
-          <CalEvent type="seminar" title="APG" time="12:45 - 14:15">
-            Teams
-            <br />
-            <Link to="https://cw.fel.cvut.cz/wiki/courses/b4m39apg/start">
-              CourseWare
-            </Link>
-          </CalEvent>
-          <CalEvent type="seminar" title="DPG" time="14:30 - 16:00">
-            Teams
-            <br />
-            <SeeLecture />
-          </CalEvent>
+          <CalEvent type="lecture" title="DPG" time="11:00 - 12:30"></CalEvent>
+          <CalEvent type="seminar" title="APG" time="12:45 - 14:15"></CalEvent>
+          <CalEvent type="seminar" title="DPG" time="14:30 - 16:00"></CalEvent>
         </Day>
         <Day>
           <DayTitle>
             <Cz>Úterý/</Cz>Tuesday
           </DayTitle>
-          <CalEvent type="lecture" title="GPU" time="11:00 - 12:30">
-            <MaybeLink to={links?.GPU}>Zoom</MaybeLink>
-            <br />
-            <Link to="https://cent.felk.cvut.cz/courses/GPU/index.html">
-              <En>Website</En>
-              <Cz>Stránky</Cz>
-            </Link>
-          </CalEvent>
-          <CalEvent type="seminar" title="GPU" time="14:30 - 16:00">
-            <MaybeLink to={links?.GPU}>Zoom</MaybeLink>
-            <SeeLecture />
-          </CalEvent>
+          <CalEvent type="lecture" title="GPU" time="11:00 - 12:30"></CalEvent>
+          <CalEvent type="seminar" title="GPU" time="14:30 - 16:00"></CalEvent>
         </Day>
         <Day>
           <DayTitle>
             <Cz>Středa/</Cz>Thursday
           </DayTitle>
-          <CalEvent type="lecture" title="APG" time="16:15 - 17:45">
-            Teams
-          </CalEvent>
+          <CalEvent type="lecture" title="APG" time="16:15 - 17:45"></CalEvent>
         </Day>
         <Day>
           <DayTitle>
             <Cz>Čtvrtek/</Cz>Wednesday
           </DayTitle>
-          <CalEvent type="lecture" title="VG" time="9:15 - 10:45">
-            <MaybeLink to={links?.CG}>Zoom</MaybeLink>
-            <br />
-            <Link to="https://cw.fel.cvut.cz/wiki/courses/cg/start">
-              CourseWare
-            </Link>
-          </CalEvent>
-          <CalEvent type="seminar" title="VG" time="11:00 - 12:30">
-            <MaybeLink to={links?.CG}>Zoom</MaybeLink>
-          </CalEvent>
-          <CalEvent type="lecture" title="MMA" time="12:45 - 14:15">
-            Teams
-          </CalEvent>
-          <CalEvent type="seminar" title="MMA" time="14:30 - 16:00">
-            Teams
-          </CalEvent>
+          <CalEvent type="lecture" title="VG" time="9:15 - 10:45"></CalEvent>
+          <CalEvent type="seminar" title="VG" time="11:00 - 12:30"></CalEvent>
+          <CalEvent type="lecture" title="MMA" time="12:45 - 14:15"></CalEvent>
+          <CalEvent type="seminar" title="MMA" time="14:30 - 16:00"></CalEvent>
         </Day>
         <Day>
           <DayTitle>
             <Cz>Pátek/</Cz>Friday
           </DayTitle>
-          <CalEvent type="lecture" title="ITT" time="12:45 - 14:15">
-            <div>
-              Teams
-              <br />
-              <Link to="https://cw.fel.cvut.cz/wiki/courses/b0m39itt1/start">
-                CourseWare
-              </Link>
-            </div>
-            <Link to="https://www.purrdata.net/">purrdata</Link> <Cz>a</Cz>
-            <En>and</En> <Link to="https://vvvv.org">vvvv</Link>
-          </CalEvent>
-          <CalEvent type="seminar" title="ITT" time="14:30 - 16:00">
-            Teams
-          </CalEvent>
+          <CalEvent type="lecture" title="ITT" time="12:45 - 14:15"></CalEvent>
+          <CalEvent type="seminar" title="ITT" time="14:30 - 16:00"></CalEvent>
         </Day>
       </Week>
     </EventProvider>
