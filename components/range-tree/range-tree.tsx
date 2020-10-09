@@ -170,8 +170,17 @@ function RangeTreeView() {
             >
               {state.results.length < 1 ? 'Empty' : ''}
               {state.results.map(({ x, y }, i) => (
-                <div key={i} css={{ border: '1px solid gray' }}>
-                  {x}:{y}
+                <div
+                  key={i}
+                  css={{
+                    background:
+                      state.hover && state.hover.x === x && state.hover.y === y
+                        ? 'lime'
+                        : undefined,
+                  }}
+                  data-point={`${x}:${y}`}
+                >
+                  ({x},{y})
                 </div>
               ))}
             </div>
