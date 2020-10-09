@@ -1,4 +1,3 @@
-import type { BBSTNode } from './bbst'
 import { findHighlightedNodeFractal, FractalNode } from './derived'
 import {
   DerivedState,

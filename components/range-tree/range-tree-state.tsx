@@ -118,9 +118,13 @@ function baseReducer(
   }
   if (action.type === 'addPoint') {
     const maxId = state.points.reduce((a, b) => Math.max(a, b.id), 0)
+    const nextPoints = [
+      ...state.points,
+      { ...action.point, id: maxId + 1 },
+    ].sort((a, b) => (a.x === b.x ? a.y - b.y : a.x - b.x))
     return {
       ...state,
-      points: [...state.points, { ...action.point, id: maxId + 1 }],
+      points: nextPoints,
       results: [],
       searchState: initialState.searchState,
       highlight: initialState.highlight,
