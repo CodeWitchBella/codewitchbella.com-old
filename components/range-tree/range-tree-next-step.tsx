@@ -63,10 +63,10 @@ export const nextState: {
           },
         }
       }
-      if (node.value >= state.query.xmin && node.value >= state.query.xmax) {
+      if (node.value >= state.query.xmin && node.value > state.query.xmax) {
         return { ...state, highlight: highlightLeft }
       }
-      if (node.value < state.query.xmin && node.value < state.query.xmax) {
+      if (node.value < state.query.xmin && node.value <= state.query.xmax) {
         return { ...state, highlight: highlightRight }
       }
 
