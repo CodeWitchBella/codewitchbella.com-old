@@ -185,20 +185,30 @@ function historicReducer(cur: State, action: Action): State {
     const prev = cur.historyPrev
     if (!prev) return cur
     const { historyPrev: deleted, ...next } = cur
-    return { ...prev, historyNext: next, derived: derive(prev, cur) }
+    return {
+      ...prev,
+      historyNext: next,
+      hover: cur.hover,
+      derived: derive(prev, cur),
+    }
   }
   if (action.type === 'redo') {
     const next = cur.historyNext
     if (!next) return cur
     const { historyNext: deleted, ...prev } = cur
-    return { ...next, historyPrev: prev, derived: derive(next, cur) }
+    return {
+      ...next,
+      historyPrev: prev,
+      hover: cur.hover,
+      derived: derive(next, cur),
+    }
   }
   const next = baseReducer(cur, action)
   const { historyNext: deleted, ...prev } = cur
   return {
     ...next,
-    historyPrev: prev,
-    historyNext: null,
+    historyPrev: action.type === 'setHover' ? cur.historyPrev : prev,
+    historyNext: action.type === 'setHover' ? cur.historyNext : null,
     derived: derive(next, prev),
   }
 }
