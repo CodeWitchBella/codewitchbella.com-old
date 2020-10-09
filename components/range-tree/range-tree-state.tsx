@@ -131,9 +131,19 @@ function baseReducer(
     }
   }
   if (action.type === 'querySet') {
+    const query = { ...state.query, [action.key]: action.value }
+    if (action.key === 'xmin' && query.xmax < query.xmin)
+      query.xmax = query.xmin
+    if (action.key === 'xmax' && query.xmax < query.xmin)
+      query.xmin = query.xmax
+    if (action.key === 'ymin' && query.ymax < query.ymin)
+      query.ymax = query.ymin
+    if (action.key === 'ymax' && query.ymax < query.ymin)
+      query.ymin = query.ymax
+
     return {
       ...state,
-      query: { ...state.query, [action.key]: action.value },
+      query,
       results: [],
       searchState: initialState.searchState,
       highlight: initialState.highlight,
