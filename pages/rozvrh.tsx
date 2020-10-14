@@ -88,7 +88,15 @@ export default function FEL() {
           MMA: {
             name: 'Multimédia a počítačová animace',
             enname: 'Multimedia and Computer Animation',
-            deets: <>Teams</>,
+            deets: (
+              <>
+                Teams
+                <br />
+                <Link to="https://cw.fel.cvut.cz/wiki/courses/b4m39mma/start">
+                  CourseWare
+                </Link>
+              </>
+            ),
           },
           ITT: {
             name: 'Intermediální tvorba a technologie I',
