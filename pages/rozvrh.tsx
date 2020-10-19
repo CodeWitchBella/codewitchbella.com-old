@@ -151,7 +151,10 @@ export default function FEL() {
           </DayTitle>
           <CalEvent type="lecture" title="DPG" time="11:00 - 12:30"></CalEvent>
           <CalEvent type="seminar" title="APG" time="12:45 - 14:15"></CalEvent>
-          <CalEvent type="seminar" title="DPG" time="14:30 - 16:00"></CalEvent>
+          <CalEvent type="seminar" title="DPG" time="14:30 - 16:00">
+            <Cz>V tom spešl týmu + dělá docházku</Cz>
+            <En>In separate team + takes attendance</En>
+          </CalEvent>
         </Day>
         <Day>
           <DayTitle>
