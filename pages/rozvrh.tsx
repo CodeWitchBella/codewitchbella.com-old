@@ -165,13 +165,13 @@ export default function FEL() {
         </Day>
         <Day>
           <DayTitle>
-            <Cz>Středa/</Cz>Thursday
+            <Cz>Středa/</Cz>Wednesday
           </DayTitle>
           <CalEvent type="lecture" title="APG" time="16:15 - 17:45"></CalEvent>
         </Day>
         <Day>
           <DayTitle>
-            <Cz>Čtvrtek/</Cz>Wednesday
+            <Cz>Čtvrtek/</Cz>Thursday
           </DayTitle>
           <CalEvent type="lecture" title="VG" time="9:15 - 10:45"></CalEvent>
           <CalEvent type="seminar" title="VG" time="11:00 - 12:30"></CalEvent>
