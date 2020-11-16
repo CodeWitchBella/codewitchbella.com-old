@@ -2,14 +2,7 @@
 import { jsx } from '@emotion/react'
 import styled from '@emotion/styled'
 import { useRouter } from 'next/dist/client/router'
-import {
-  PropsWithChildren,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { CalEvent, Cz, En, EventProvider } from '../components/calendar-event'
 import { DateTime, Interval } from 'luxon'
 
@@ -174,7 +167,8 @@ export default function FEL() {
       <div>
         <WeekNumber>
           <Cz>Týden semestru:</Cz>
-          <En>Week number:</En>{' '}
+          <En>Week number:</En>
+          <> </>
         </WeekNumber>
       </div>
       <Week>
@@ -187,6 +181,9 @@ export default function FEL() {
           <CalEvent type="seminar" title="DPG" time="14:30 - 16:00">
             <Cz>V tom spešl týmu + dělá docházku</Cz>
             <En>In separate team + takes attendance</En>
+            <br />
+            <Cz>Odevzdávání ve 13. týdnu</Cz>
+            <En>Project deadline: week 13</En>
           </CalEvent>
         </Day>
         <Day>
@@ -246,15 +243,6 @@ const Day = styled.div({
 const DayTitle = styled.div({
   alignSelf: 'center',
 })
-
-function SeeLecture() {
-  return (
-    <div>
-      <Cz>Viz přednáška</Cz>
-      <En>See lecture</En>
-    </div>
-  )
-}
 
 function useEn() {
   const router = useRouter()
