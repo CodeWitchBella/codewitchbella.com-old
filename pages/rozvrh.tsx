@@ -2,8 +2,35 @@
 import { jsx } from '@emotion/react'
 import styled from '@emotion/styled'
 import { useRouter } from 'next/dist/client/router'
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  PropsWithChildren,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { CalEvent, Cz, En, EventProvider } from '../components/calendar-event'
+import { DateTime, Interval } from 'luxon'
+
+function WeekNumber({ children }: { children: JSX.Element | JSX.Element[] }) {
+  const [week, setWeek] = useState<null | number>(null)
+
+  useEffect(() => {
+    const int = Interval.fromDateTimes(
+      DateTime.fromObject({ year: 2020, month: 9, day: 21 }),
+      DateTime.local(),
+    ).toDuration()
+    setWeek(Math.floor(int.as('week') + 1))
+  }, [])
+  if (week === null) return null
+  return (
+    <>
+      {children}
+      {week}
+    </>
+  )
+}
 
 export default function FEL() {
   const [showTitles, setShowTitles] = useBooleanQueryParam('titles', false)
@@ -143,6 +170,12 @@ export default function FEL() {
           <Cz>Detaily</Cz>
           <En>Details</En>
         </label>
+      </div>
+      <div>
+        <WeekNumber>
+          <Cz>Týden semestru:</Cz>
+          <En>Week number:</En>{' '}
+        </WeekNumber>
       </div>
       <Week>
         <Day>
