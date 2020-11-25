@@ -51,7 +51,9 @@ export function Technical() {
         Technical stuff
       </button>
       <div className="technical" style={visible ? {} : { display: 'none' }}>
-        <h2>Desktop SSH key</h2>
+        <h2>Desktop SSH key (ed25519)</h2>
+        <CopyOnClick>{`ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBxPNmNRwDY3Az5S7O5IXVzHG0tNp1J1A9ndLvGjk1X7 isabella@isabella-pc`}</CopyOnClick>
+        <h2>Desktop SSH key (rsa)</h2>
         <CopyOnClick>{`ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAEAQDAyefs+TDyduI7SECWwgBLGRYT+G6LEQZjbzJjI0Fkp4350WJjBg6EfRSDevDr4/scQBPW0ElbMiHOG6GskhfCVLkCjnJfxplYIsTcSgYyuaQcBJitbcHO0g8J0Nf4/dPVm3PyTXeukcZ8f5Odnf+Ipi2W+WH4iBuFF63Fieq3Uo+xKASEcReZy3XCiBfgIwgv7ratqut0XNZQ9QMp//y+0a4s4y3tF/nNOPl3XkqYT/O2+cSaPYgp2W2V+0qwVMNef5BVRhzFMMAo4RO6Q4/vFaI7hQ/P47JLfxqulk/Ppb9gBNPmjXoxZHGOfE8VpdEBVNLcKmFl3q1OHbM0urifgB1Xp3rKETxbtJuIZW5xLFMEnblTliB/hsX1GwJ7risV497uNaamV2Lan+0nkb32tA9o+f/7vDGBd9TfqZjRS10HZLwPc9ylyAHXB018TCow9YGsDbXydkSnpwbEkKLE7mLj4HZyOsmGSanlUzT8xD3vIX9bqZP9sqT2c2BER/68vqSe/PMB0wihFdmTEa2DWyqfVyfavj7+rpRq8Cr8N+yozZtbkOfL5pMXPrt/rNZHSD6wtuO8gwG6Vmg3HwP0H5pEMQhUj65piU2CR2gNc7TWaCWPpm3LDq3gfqPciuj0ORc03HOu3RUBTRNtF27ZC7z3yUFdsv/n/Fwvsbw0MZLrAxnPFBWBhLxIEI7jbaJHkr33tDh3paLi5lPMldMiGfqqWE4t5Hl0d5LAO4FKOEH9CPWBx5xtA/mmHrDXtuaBQ15L++Ugs/C2rEQ4LE3utVWjHQKmDx4Fq0rbU8MQfYUVeYTtiCz1oDo/49NEy8y51yyOiEG2hii8ZFRyQczME/sJWrY91VCsecg+vQfr1BerI+PWgHWMfAydEY/J0bQE/TLDi9yDBTAlvRqxpzz2/Vpaq7/bVuf9M2hXu0H1r06KdjD/qF7djoakc92WaZTNjloZ0bmlVSosgbetgiYeTk6tD7gVN7ew1LT5H9YKYXiOLfo1JF2yvx0XsCjJsOeh5h5XzjGk9a1YdggoLTlKIhF/pHK9BJuGfg13DB6sVT8ZK9rr69FjuGvQrmogqRD86Vv8+tmT0vFskO4yHpc3ylwJWOWYSZlsjw8V7egQ7oNTDRx5lofKtIdJp33jFeeqzuiPlfPeshFy6Dd0W18YO+pNawlxs57WmMY9UK0Rc52/C/jXedMAnYnUNDeaTZDXoIVGyu0C7Yn1dLKXT3vZJ8og4zjARs2WuIcdKsH5/lrrCLngMttaVpdCxlurkRxt6ibfF/SgLIahYulD3yTawmRpjK6ttbUoKbP7cU1uFnPODLPU7zzEpktUaHPtT4/Uv4lZTVzP2HvV/oIH0uE/ isabella@desktop.skorepova.info`}</CopyOnClick>
         <h2>GPG key</h2>
         <CopyOnClick>{gpg}</CopyOnClick>
