@@ -1,6 +1,7 @@
 *
 # folder
 !/components
+!/cpp-src
 !/pages
 !/public
 !/src
@@ -9,6 +10,7 @@
 !/.editorconfig
 !/.eslintrc.js
 !/.prettierrc
+!/compile-cpp.sh
 !/entrypoint.sh
 !/next-env.d.ts
 !/next.config.js
