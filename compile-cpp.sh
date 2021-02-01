@@ -32,7 +32,7 @@ else
 fi
 
 # Enable asyncify
-OPTS="$OPTS -s ASYNCIFY -s "ASYNCIFY_IMPORTS='["algorithm_step","algorithm_done"]'
+OPTS="$OPTS -s ASYNCIFY -s ASYNCIFY_IGNORE_INDIRECT=1 -s "ASYNCIFY_IMPORTS='["algorithm_step","algorithm_done"]'
 # Build for web es6
 OPTS="$OPTS -s MODULARIZE=1 -s EXPORT_ES6=1 -s ENVIRONMENT=web"
 # Disable exceptions and RTTI
