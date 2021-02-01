@@ -3,7 +3,12 @@ import { jsx } from '@emotion/react'
 import styled from '@emotion/styled'
 import { useRouter } from 'next/dist/client/router'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
-import { CalEvent, Cz, En, EventProvider } from '../components/calendar-event'
+import {
+  CalEvent,
+  Cz,
+  En,
+  EventProvider,
+} from '../../components/calendar-event'
 import { DateTime, Interval } from 'luxon'
 
 function WeekNumber({ children }: { children: JSX.Element | JSX.Element[] }) {
@@ -11,10 +16,11 @@ function WeekNumber({ children }: { children: JSX.Element | JSX.Element[] }) {
 
   useEffect(() => {
     const int = Interval.fromDateTimes(
-      DateTime.fromObject({ year: 2020, month: 9, day: 21 }),
+      DateTime.fromObject({ year: 2021, month: 2, day: 1 }),
       DateTime.local(),
     ).toDuration()
-    setWeek(Math.floor(int.as('week') + 1))
+    const week = int.as('week') - 2
+    setWeek(Math.floor(week <= 0 ? week : week + 1))
   }, [])
   if (week === null) return null
   return (
@@ -42,96 +48,49 @@ export default function FEL() {
         czech: !english,
         deets,
         subjects: {
-          DPG: {
-            name: 'Datové struktury počítačové grafiky',
-            enname: 'Data Structures for Computer Graphics',
-            deets: (
-              <>
-                Havran
-                <br />
-                Teams
-                <br />
-                <Link to="https://cw.fel.cvut.cz/wiki/courses/b4m39dpg/start">
-                  CourseWare
-                </Link>
-              </>
-            ),
+          PSA: {
+            longcode: 'B3B04PSA',
+            name: 'Akademické psaní',
+            enname: 'Academic Writing',
+            deets: <></>,
           },
-          APG: {
-            name: 'Algoritmy počítačové grafiky',
-            enname: 'Algorithms of Computer Graphics',
-            deets: (
-              <>
-                Teams
-                <br />
-                <Link to="https://cw.fel.cvut.cz/wiki/courses/b4m39apg/start">
-                  CourseWare
-                </Link>
-                <br />
-                <Link to="https://cw.felk.cvut.cz/brute/student/course/B4M39APG">
-                  Brute
-                </Link>
-              </>
-            ),
+          TAL: {
+            longcode: 'B4M01TAL',
+            name: 'Teorie algoritmů',
+            enname: 'Theory of Algorithms',
+            deets: <></>,
           },
-          GPU: {
-            name: 'Obecné výpočty na grafických procesorech',
-            enname: 'General-Purpose Computing on GPU',
-            deets: (
-              <>
-                <MaybeLink to={links?.GPU}>Zoom</MaybeLink>
-                <br />
-                <Link to="https://cent.felk.cvut.cz/courses/GPU/index.html">
-                  <En>Website</En>
-                  <Cz>Stránky</Cz>
-                </Link>
-              </>
-            ),
+          GVG: {
+            longcode: 'B4M33GVG',
+            name: 'Geometrie počítačového vidění a grafiky',
+            enname: 'Geometry of Computer Vision and Graphics',
+            deets: <></>,
           },
-          VG: {
-            name: 'Výpočetní geometrie',
-            enname: 'Computational Geometry',
-            deets: (
-              <>
-                <MaybeLink to={links?.CG}>Zoom</MaybeLink>
-                <br />
-                <Link to="https://cw.fel.cvut.cz/wiki/courses/cg/start">
-                  CourseWare
-                </Link>
-                <br />
-                <Link to="https://cw.felk.cvut.cz/brute/student/course/CG">
-                  Brute
-                </Link>
-              </>
-            ),
+          KO: {
+            longcode: 'B4M35KO',
+            name: 'Kombinatorická optimalizace',
+            enname: 'Combinatorial Optimization',
+            deets: <></>,
           },
-          MMA: {
-            name: 'Multimédia a počítačová animace',
-            enname: 'Multimedia and Computer Animation',
-            deets: (
-              <>
-                Teams
-                <br />
-                <Link to="https://cw.fel.cvut.cz/wiki/courses/b4m39mma/start">
-                  CourseWare
-                </Link>
-              </>
-            ),
+          VIZ: {
+            longcode: 'B4M39VIZ',
+            name: 'Vizualizace',
+            enname: 'Visualization',
+            deets: <></>,
           },
           ITT: {
-            name: 'Intermediální tvorba a technologie I',
-            enname: 'Applied Multimedia and Technology I',
+            longcode: 'B0M39ITT2',
+            name: 'Intermediální tvorba a technologie II',
+            enname: 'Applied Multimedia and Technology II',
             deets: (
               <>
                 <div>
                   Teams
                   <br />
-                  <Link to="https://cw.fel.cvut.cz/wiki/courses/b0m39itt1/start">
+                  <Link to="https://cw.fel.cvut.cz/wiki/courses/b0m39itt2/start">
                     CourseWare
                   </Link>
                 </div>
-                <Link to="https://www.purrdata.net/">purrdata</Link> <Cz>a</Cz>
-                <En>and</En> <Link to="https://vvvv.org">vvvv</Link>
               </>
             ),
           },
@@ -176,44 +135,56 @@ export default function FEL() {
           <DayTitle>
             <Cz>Pondělí/</Cz>Monday
           </DayTitle>
-          <CalEvent type="lecture" title="DPG" time="11:00 - 12:30"></CalEvent>
-          <CalEvent type="seminar" title="APG" time="12:45 - 14:15"></CalEvent>
-          <CalEvent type="seminar" title="DPG" time="14:30 - 16:00">
-            <Cz>V tom spešl týmu + dělá docházku</Cz>
-            <En>In separate team + takes attendance</En>
-            <br />
-            <Cz>Odevzdávání ve 13. týdnu</Cz>
-            <En>Project deadline: week 13</En>
+          <CalEvent type="seminar" title="PSA" time="9:15 - 10:45">
+            T2:E1-106
+          </CalEvent>
+          <CalEvent type="lecture" title="GVG" time="12:45 - 14:15">
+            KN:E-126
+          </CalEvent>
+          <CalEvent type="seminar" title="GVG" time="14:30 - 16:00">
+            KN:E-230
           </CalEvent>
         </Day>
         <Day>
           <DayTitle>
             <Cz>Úterý/</Cz>Tuesday
           </DayTitle>
-          <CalEvent type="lecture" title="GPU" time="11:00 - 12:30"></CalEvent>
-          <CalEvent type="seminar" title="GPU" time="14:30 - 16:00"></CalEvent>
+          <CalEvent type="lecture" title="TAL" time="08:15 - 10:45">
+            T2:D3-209 (Dejvice)
+          </CalEvent>
+          <CalEvent type="lecture" title="KO" time="11:45 - 14:15">
+            T2:D3-309 (Dejvice)
+          </CalEvent>
+          <CalEvent type="seminar" title="KO" time="14:30 - 16:00">
+            T2:H1-131 (Dejvice)
+          </CalEvent>
         </Day>
         <Day>
           <DayTitle>
             <Cz>Středa/</Cz>Wednesday
           </DayTitle>
-          <CalEvent type="lecture" title="APG" time="16:15 - 17:45"></CalEvent>
+          <CalEvent type="seminar" title="TAL" time="12:45 - 14:15">
+            T2:C3-52 (Dejvice)
+          </CalEvent>
         </Day>
         <Day>
           <DayTitle>
             <Cz>Čtvrtek/</Cz>Thursday
           </DayTitle>
-          <CalEvent type="lecture" title="VG" time="9:15 - 10:45"></CalEvent>
-          <CalEvent type="seminar" title="VG" time="11:00 - 12:30"></CalEvent>
-          <CalEvent type="lecture" title="MMA" time="12:45 - 14:15"></CalEvent>
-          <CalEvent type="seminar" title="MMA" time="14:30 - 16:00"></CalEvent>
+          <CalEvent type="lecture" title="VIZ" time="11:00 - 12:30">
+            KN:E-301 (Šrámkova posluchárna)
+          </CalEvent>
+          <CalEvent type="seminar" title="VIZ" time="14:30 - 16:00">
+            KN:E-327 (Solarium)
+          </CalEvent>
         </Day>
         <Day>
           <DayTitle>
             <Cz>Pátek/</Cz>Friday
           </DayTitle>
-          <CalEvent type="lecture" title="ITT" time="12:45 - 14:15"></CalEvent>
-          <CalEvent type="seminar" title="ITT" time="14:30 - 16:00"></CalEvent>
+          <CalEvent type="lab" title="ITT" time="12:45 - 16:00">
+            T2:H1-24c (Dejvice)
+          </CalEvent>
         </Day>
       </Week>
     </EventProvider>

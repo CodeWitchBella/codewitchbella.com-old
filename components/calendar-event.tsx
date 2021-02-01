@@ -11,7 +11,7 @@ export function CalEvent({
 }: {
   title: string
   time: string
-  type: 'lecture' | 'seminar'
+  type: 'lecture' | 'seminar' | 'lab'
   children?: ReactNode
 }) {
   const ctx = useContext(eventContext)
@@ -20,7 +20,13 @@ export function CalEvent({
     <Event>
       <div css={{ fontWeight: 'bold' }}>
         {title}{' '}
-        {!ctx.czech ? type : type === 'lecture' ? 'přednáška' : 'cvičení'}
+        {!ctx.czech
+          ? type
+          : type === 'lecture'
+          ? 'přednáška'
+          : type === 'seminar'
+          ? 'cvičení'
+          : 'laboratoř'}
       </div>
       <div>{time}</div>
       {ctx.showTitles ? (
@@ -47,7 +53,7 @@ const Event = styled.div({
 const eventContext = createContext({
   subjects: {} as {
     [key: string]:
-      | { name: string; enname?: string; deets: JSX.Element }
+      | { name: string; longcode: string; enname?: string; deets: JSX.Element }
       | undefined
   },
   showTitles: false,
