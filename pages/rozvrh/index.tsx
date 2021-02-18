@@ -56,7 +56,11 @@ export default function FEL() {
             longcode: 'B3B04PSA',
             name: 'Akademické psaní',
             enname: 'Academic Writing',
-            deets: <></>,
+            deets: (
+              <>
+                <div>Teams</div>
+              </>
+            ),
           },
           TAL: {
             longcode: 'B4M01TAL',
@@ -73,6 +77,7 @@ export default function FEL() {
                 <Link to="https://cw.fel.cvut.cz/wiki/courses/gvg/start">
                   CourseWare
                 </Link>
+                <div>Teams</div>
               </>
             ),
           },
@@ -185,6 +190,10 @@ export default function FEL() {
           </DayTitle>
           <CalEvent type="lecture" title="TAL" time="08:15 - 10:45">
             <Room>T2:D3-209 (Dejvice)</Room>
+            <Deets>
+              <div>Demlová</div>
+              <div>Teams</div>
+            </Deets>
           </CalEvent>
           <CalEvent type="lecture" title="KO" time="11:45 - 14:15">
             <Room>T2:D3-309 (Dejvice)</Room>
@@ -194,6 +203,9 @@ export default function FEL() {
           </CalEvent>
           <CalEvent type="seminar" title="KO" time="14:30 - 16:00">
             <Room>T2:H1-131 (Dejvice)</Room>
+            <Deets>
+              <div>Teams</div>
+            </Deets>
           </CalEvent>
         </Day>
         <Day>
@@ -203,6 +215,7 @@ export default function FEL() {
           <CalEvent type="seminar" title="TAL" time="12:45 - 14:15">
             <Room>T2:C3-52 (Dejvice)</Room>
             <Deets>
+              <div>Žukovec</div>
               <div>Teams</div>
             </Deets>
           </CalEvent>
@@ -219,6 +232,9 @@ export default function FEL() {
           </CalEvent>
           <CalEvent type="seminar" title="VIZ" time="14:30 - 16:00">
             <Room>KN:E-327 (Solarium)</Room>
+            <Deets>
+              <div>Teams</div>
+            </Deets>
           </CalEvent>
         </Day>
         <Day>
