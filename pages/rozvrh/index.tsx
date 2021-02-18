@@ -188,6 +188,9 @@ export default function FEL() {
           </CalEvent>
           <CalEvent type="lecture" title="KO" time="11:45 - 14:15">
             <Room>T2:D3-309 (Dejvice)</Room>
+            <Deets>
+              <div>Youtube</div>
+            </Deets>
           </CalEvent>
           <CalEvent type="seminar" title="KO" time="14:30 - 16:00">
             <Room>T2:H1-131 (Dejvice)</Room>
@@ -199,6 +202,9 @@ export default function FEL() {
           </DayTitle>
           <CalEvent type="seminar" title="TAL" time="12:45 - 14:15">
             <Room>T2:C3-52 (Dejvice)</Room>
+            <Deets>
+              <div>Teams</div>
+            </Deets>
           </CalEvent>
         </Day>
         <Day>
