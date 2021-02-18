@@ -39,7 +39,9 @@ export function CalEvent({
           {subject?.deets}
           <div>{children}</div>
         </>
-      ) : null}
+      ) : (
+        <div>{children}</div>
+      )}
     </Event>
   )
 }
@@ -59,6 +61,7 @@ const eventContext = createContext({
   showTitles: false,
   czech: true,
   deets: false,
+  room: false,
 })
 export const EventProvider = eventContext.Provider
 
@@ -71,5 +74,17 @@ export function En({ children }: { children: ReactNode }) {
 export function Cz({ children }: { children: ReactNode }) {
   const ctx = useContext(eventContext)
   if (!ctx.czech) return null
+  return <>{children}</>
+}
+
+export function Room({ children }: { children: ReactNode }) {
+  const ctx = useContext(eventContext)
+  if (!ctx.room) return null
+  return <>{children}</>
+}
+
+export function Deets({ children }: { children: ReactNode }) {
+  const ctx = useContext(eventContext)
+  if (!ctx.deets) return null
   return <>{children}</>
 }

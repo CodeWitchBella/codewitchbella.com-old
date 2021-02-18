@@ -6,8 +6,10 @@ import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   CalEvent,
   Cz,
+  Deets,
   En,
   EventProvider,
+  Room,
 } from '../../components/calendar-event'
 import { DateTime, Interval } from 'luxon'
 
@@ -35,6 +37,7 @@ export default function FEL() {
   const [showTitles, setShowTitles] = useBooleanQueryParam('titles', false)
   const [english, toggleLang] = useEn()
   const [deets, setDeets] = useBooleanQueryParam('deets', true)
+  const [room, setRoom] = useBooleanQueryParam('room', false)
   const [links, setLinks] = useLocalStorage('rozvrh:links')
 
   useSetOnWindow('setLink', (type: string, value: string) => {
@@ -47,6 +50,7 @@ export default function FEL() {
         showTitles,
         czech: !english,
         deets,
+        room,
         subjects: {
           PSA: {
             longcode: 'B3B04PSA',
@@ -64,19 +68,39 @@ export default function FEL() {
             longcode: 'B4M33GVG',
             name: 'Geometrie počítačového vidění a grafiky',
             enname: 'Geometry of Computer Vision and Graphics',
-            deets: <></>,
+            deets: (
+              <>
+                <Link to="https://cw.fel.cvut.cz/wiki/courses/gvg/start">
+                  CourseWare
+                </Link>
+              </>
+            ),
           },
           KO: {
             longcode: 'B4M35KO',
             name: 'Kombinatorická optimalizace',
             enname: 'Combinatorial Optimization',
-            deets: <></>,
+            deets: (
+              <>
+                <div>Hanzálek</div>
+                <Link to="https://cw.fel.cvut.cz/wiki/courses/ko/start">
+                  CourseWare
+                </Link>
+              </>
+            ),
           },
           VIZ: {
             longcode: 'B4M39VIZ',
             name: 'Vizualizace',
             enname: 'Visualization',
-            deets: <></>,
+            deets: (
+              <>
+                <div>Čmolík</div>
+                <Link to="https://moodle.fel.cvut.cz/course/view.php?id=5728">
+                  Moodle
+                </Link>
+              </>
+            ),
           },
           ITT: {
             longcode: 'B0M39ITT2',
@@ -122,6 +146,16 @@ export default function FEL() {
           <Cz>Detaily</Cz>
           <En>Details</En>
         </label>
+        <label>
+          <input
+            type="checkbox"
+            onChange={(evt) => setRoom(evt.target.checked)}
+            css={{ paddingInlineEnd: '.5rem' }}
+            checked={room}
+          />
+          <Cz>Zobrazit místnosti</Cz>
+          <En>Show rooms</En>
+        </label>
       </div>
       <div>
         <WeekNumber>
@@ -136,13 +170,13 @@ export default function FEL() {
             <Cz>Pondělí/</Cz>Monday
           </DayTitle>
           <CalEvent type="seminar" title="PSA" time="9:15 - 10:45">
-            T2:E1-106
+            <Room>T2:E1-106</Room>
           </CalEvent>
           <CalEvent type="lecture" title="GVG" time="12:45 - 14:15">
-            KN:E-126
+            <Room>KN:E-126</Room>
           </CalEvent>
           <CalEvent type="seminar" title="GVG" time="14:30 - 16:00">
-            KN:E-230
+            <Room>KN:E-230</Room>
           </CalEvent>
         </Day>
         <Day>
@@ -150,13 +184,13 @@ export default function FEL() {
             <Cz>Úterý/</Cz>Tuesday
           </DayTitle>
           <CalEvent type="lecture" title="TAL" time="08:15 - 10:45">
-            T2:D3-209 (Dejvice)
+            <Room>T2:D3-209 (Dejvice)</Room>
           </CalEvent>
           <CalEvent type="lecture" title="KO" time="11:45 - 14:15">
-            T2:D3-309 (Dejvice)
+            <Room>T2:D3-309 (Dejvice)</Room>
           </CalEvent>
           <CalEvent type="seminar" title="KO" time="14:30 - 16:00">
-            T2:H1-131 (Dejvice)
+            <Room>T2:H1-131 (Dejvice)</Room>
           </CalEvent>
         </Day>
         <Day>
@@ -164,7 +198,7 @@ export default function FEL() {
             <Cz>Středa/</Cz>Wednesday
           </DayTitle>
           <CalEvent type="seminar" title="TAL" time="12:45 - 14:15">
-            T2:C3-52 (Dejvice)
+            <Room>T2:C3-52 (Dejvice)</Room>
           </CalEvent>
         </Day>
         <Day>
@@ -172,10 +206,13 @@ export default function FEL() {
             <Cz>Čtvrtek/</Cz>Thursday
           </DayTitle>
           <CalEvent type="lecture" title="VIZ" time="11:00 - 12:30">
-            KN:E-301 (Šrámkova posluchárna)
+            <Room>KN:E-301 (Šrámkova posluchárna)</Room>
+            <Deets>
+              <div>Youtube</div>
+            </Deets>
           </CalEvent>
           <CalEvent type="seminar" title="VIZ" time="14:30 - 16:00">
-            KN:E-327 (Solarium)
+            <Room>KN:E-327 (Solarium)</Room>
           </CalEvent>
         </Day>
         <Day>
@@ -183,7 +220,7 @@ export default function FEL() {
             <Cz>Pátek/</Cz>Friday
           </DayTitle>
           <CalEvent type="lab" title="ITT" time="12:45 - 16:00">
-            T2:H1-24c (Dejvice)
+            <Room>T2:H1-24c (Dejvice)</Room>
           </CalEvent>
         </Day>
       </Week>

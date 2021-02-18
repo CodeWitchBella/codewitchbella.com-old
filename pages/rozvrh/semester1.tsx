@@ -6,6 +6,7 @@ import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   CalEvent,
   Cz,
+  Deets,
   En,
   EventProvider,
 } from '../../components/calendar-event'
@@ -43,6 +44,7 @@ export default function FEL() {
   return (
     <EventProvider
       value={{
+        room: false,
         showTitles,
         czech: !english,
         deets,
@@ -190,11 +192,13 @@ export default function FEL() {
           <CalEvent type="lecture" title="DPG" time="11:00 - 12:30"></CalEvent>
           <CalEvent type="seminar" title="APG" time="12:45 - 14:15"></CalEvent>
           <CalEvent type="seminar" title="DPG" time="14:30 - 16:00">
-            <Cz>V tom spešl týmu + dělá docházku</Cz>
-            <En>In separate team + takes attendance</En>
-            <br />
-            <Cz>Odevzdávání ve 13. týdnu</Cz>
-            <En>Project deadline: week 13</En>
+            <Deets>
+              <Cz>V tom spešl týmu + dělá docházku</Cz>
+              <En>In separate team + takes attendance</En>
+              <br />
+              <Cz>Odevzdávání ve 13. týdnu</Cz>
+              <En>Project deadline: week 13</En>
+            </Deets>
           </CalEvent>
         </Day>
         <Day>
