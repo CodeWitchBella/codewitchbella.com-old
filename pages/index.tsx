@@ -52,7 +52,7 @@ export default function Index() {
       `}</style>
       <h1>Bc. Isabella Skořepová</h1>
       <div className="img">
-        <img src="/static/avatar.jpg" />
+        <img src="/static/avatar3_cropped.png" />
       </div>
       <p>
         Člověk by řekl, že když dělám webovky už několik let, že budu mít hezčí
