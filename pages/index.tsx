@@ -66,6 +66,11 @@ export default function Index() {
           <Link href="https://isbl.cz/zpevnik">Zpěvník (funguje offline)</Link>
         </li>
         <li>
+          <Link href="https://github.com/CodeWitchBella/itt2021-host#readme">
+            Host
+          </Link>
+        </li>
+        <li>
           <Link href="https://isbl.cz/mantinely">mantinelydemokracie.cz</Link>{' '}
           (archiv)
         </li>
