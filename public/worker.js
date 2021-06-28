@@ -1,4 +1,4 @@
-import * as Comlink from 'https://unpkg.com/comlink/dist/esm/comlink.mjs'
+import * as Comlink from 'https://unpkg.com/comlink@4.3.1/dist/esm/comlink.mjs'
 
 async function init(Module, fn) {
   let started = false
@@ -28,6 +28,7 @@ let ref
 
 Comlink.expose({
   async init(path, fn) {
+    console.log('init', path, fn)
     const Factory = (await import(path)).default
     const Module = await Factory()
     ref = await init(Module, fn)
