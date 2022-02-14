@@ -1,5 +1,4 @@
-/** @jsx jsx */
-import { jsx } from '@emotion/react'
+/** @jsxImportSource @emotion/react */
 import styled from '@emotion/styled'
 import { ReactNode, useContext, createContext } from 'react'
 

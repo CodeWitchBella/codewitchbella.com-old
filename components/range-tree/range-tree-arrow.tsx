@@ -1,5 +1,4 @@
-/** @jsx jsx */
-import { jsx } from '@emotion/react'
+/** @jsxImportSource @emotion/react */
 import { useEffect, useRef } from 'react'
 
 export function ArrowEnd({ id, ...rest }: { id: string; className?: string }) {

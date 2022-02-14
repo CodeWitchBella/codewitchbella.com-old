@@ -1,5 +1,4 @@
-/** @jsx jsx */
-import { jsx } from '@emotion/react'
+/** @jsxImportSource @emotion/react */
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import {
   Points,

@@ -1,8 +1,7 @@
-/** @jsx jsx */
-import { jsx } from '@emotion/react'
+/** @jsxImportSource @emotion/react */
 import { Fragment, useMemo, useRef, useState } from 'react'
 import { useRangeTreeDispatch, useRangeTreeState } from './range-tree-state'
-import Resizer from '@codewitchbella/react-resizer'
+import Resizer from '@isbl/react-resizer'
 
 export function PointGrid({ xmax, ymax }: { xmax: number; ymax: number }) {
   const { query, points, hover } = useRangeTreeState()

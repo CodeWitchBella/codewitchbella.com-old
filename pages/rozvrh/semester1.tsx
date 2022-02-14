@@ -1,5 +1,4 @@
-/** @jsx jsx */
-import { jsx } from '@emotion/react'
+/** @jsxImportSource @emotion/react */
 import styled from '@emotion/styled'
 import { useRouter } from 'next/dist/client/router'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
