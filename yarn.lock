@@ -1823,12 +1823,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@isbl/react-resizer@npm:^0.2.4":
+"@isbl/react-resizer@npm:0.2.4":
   version: 0.2.4
   resolution: "@isbl/react-resizer@npm:0.2.4"
   peerDependencies:
     react: ^16.14.0||^17.0.0
   checksum: cd7f529efd8a56919ee83ea8762bb1ba4288f5e00b32e8bb666361bc567f5520cb70c12ca216a93381fb3e208cbd24e4ca613df2c16472686295f9e5cc55f719
+  languageName: node
+  linkType: hard
+
+"@isbl/react-resizer@patch:@isbl/react-resizer@npm:0.2.4#.yarn/patches/@isbl-react-resizer-npm-0.2.4-07337a3525::locator=codewitchbella.com%40workspace%3A.":
+  version: 0.2.4
+  resolution: "@isbl/react-resizer@patch:@isbl/react-resizer@npm%3A0.2.4#.yarn/patches/@isbl-react-resizer-npm-0.2.4-07337a3525::version=0.2.4&hash=bb72a8&locator=codewitchbella.com%40workspace%3A."
+  peerDependencies:
+    react: ^16.14.0||^17.0.0
+  checksum: fe9d3ecde8e6f5d235b323b153d4b4d73dc6f8edf03d3736ba4306206d0a324f0d2b79c08b95ad8d73cd4e911b3ad39fb65e2151faa5509823a8293431aa4700
   languageName: node
   linkType: hard
 
@@ -2533,7 +2542,7 @@ __metadata:
     "@emotion/eslint-plugin": ^11.7.0
     "@emotion/react": ^11.7.1
     "@emotion/styled": ^11.6.0
-    "@isbl/react-resizer": ^0.2.4
+    "@isbl/react-resizer": 0.2.4
     "@types/luxon": ^2.0.9
     "@types/node": ^17.0.17
     "@types/react": ^17.0.39
