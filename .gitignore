@@ -1,3 +1,5 @@
+/.yarn/*
+!/.yarn/releases
 # Logs
 logs
 *.log
