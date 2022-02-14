@@ -165,8 +165,8 @@ function baseReducer(
       ].map(([x, y], i) => ({ x, y, id: i + 1 })),
       results: [],
       query: {
-        ymin: 4,
-        ymax: 6,
+        ymin: 2,
+        ymax: 4,
         xmin: 1,
         xmax: 3,
       },

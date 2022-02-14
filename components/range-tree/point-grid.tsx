@@ -108,7 +108,7 @@ export function PointGrid({ xmax, ymax }: { xmax: number; ymax: number }) {
         ))}
         <rect
           x={query.xmin - 0.5}
-          y={query.ymin - 0.5}
+          y={ymax - query.ymax - 0.5}
           width={query.xmax - query.xmin + 1}
           height={query.ymax - query.ymin + 1}
           fill="green"

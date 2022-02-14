@@ -245,10 +245,14 @@ export const nextState: {
         state.highlight,
         state.query.ymin,
       )
+      const added = collectUntil(node, state.query.ymax).filter(
+        (point) =>
+          !state.results.some((p2) => p2.x === point.x && p2.y === point.y),
+      )
       return {
         ...state,
         highlight: state.searchState.reportBacktrack,
-        results: [...state.results, ...collectUntil(node, state.query.ymax)],
+        results: [...state.results, ...added],
         searchState: {
           ...state.searchState,
           reportBacktrack: initialState.highlight,
